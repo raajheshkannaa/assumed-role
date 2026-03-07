@@ -34,7 +34,7 @@ SELECT
 FROM
     event_data_store_id
 WHERE
-    eventTime > '2024-03-01T00:00:00Z'
+    eventTime > '2025-03-01T00:00:00Z'
     AND eventName IN ('CreateUser', 'CreateAccessKey', 'AttachUserPolicy', 'PutUserPolicy', 'CreateLoginProfile')
 ORDER BY eventTime ASC
 ```
@@ -45,7 +45,7 @@ But one entry freezes my blood.
 
 ```json
 {
-    "eventTime": "2024-03-11T14:22:08Z",
+    "eventTime": "2025-03-10T14:22:08Z",
     "eventSource": "iam.amazonaws.com",
     "eventName": "CreateUser",
     "awsRegion": "us-east-1",
@@ -62,7 +62,7 @@ But one entry freezes my blood.
             "userName": "svc-monitoring-agent",
             "userId": "AIDAEXAMPLE123456789",
             "arn": "arn:aws:iam::192837465019:user/svc-monitoring-agent",
-            "createDate": "2024-03-11T14:22:08Z"
+            "createDate": "2025-03-10T14:22:08Z"
         }
     }
 }
@@ -76,7 +76,7 @@ I check what they attached to it:
 
 ```json
 {
-    "eventTime": "2024-03-11T14:22:31Z",
+    "eventTime": "2025-03-10T14:22:31Z",
     "eventSource": "iam.amazonaws.com",
     "eventName": "AttachUserPolicy",
     "requestParameters": {
@@ -92,7 +92,7 @@ And then the access key:
 
 ```json
 {
-    "eventTime": "2024-03-11T14:22:45Z",
+    "eventTime": "2025-03-10T14:22:45Z",
     "eventSource": "iam.amazonaws.com",
     "eventName": "CreateAccessKey",
     "requestParameters": {
@@ -103,7 +103,7 @@ And then the access key:
             "userName": "svc-monitoring-agent",
             "accessKeyId": "AKIAZBEXAMPLE789",
             "status": "Active",
-            "createDate": "2024-03-11T14:22:45Z"
+            "createDate": "2025-03-10T14:22:45Z"
         }
     }
 }
@@ -128,7 +128,7 @@ SELECT
 FROM
     event_data_store_id
 WHERE
-    eventTime > '2024-03-11T00:00:00Z'
+    eventTime > '2025-03-10T00:00:00Z'
     AND recipientAccountId = '192837465019'
     AND eventName IN ('CreateFunction20150331', 'PutRule', 'PutTargets')
     AND userIdentity.arn LIKE '%svc-monitoring-agent%'
@@ -137,7 +137,7 @@ ORDER BY eventTime ASC
 
 ```json
 {
-    "eventTime": "2024-03-11T15:08:12Z",
+    "eventTime": "2025-03-10T15:08:12Z",
     "eventSource": "lambda.amazonaws.com",
     "eventName": "CreateFunction20150331",
     "requestParameters": {
@@ -152,7 +152,7 @@ ORDER BY eventTime ASC
 
 ```json
 {
-    "eventTime": "2024-03-11T15:09:44Z",
+    "eventTime": "2025-03-10T15:09:44Z",
     "eventSource": "events.amazonaws.com",
     "eventName": "PutRule",
     "requestParameters": {
@@ -345,7 +345,7 @@ Third: I pull Kira in fully. Not as a spectator in the incident channel — as a
 for account_id in $(aws organizations list-accounts --query 'Accounts[].Id' --output text --profile management); do
     echo "=== Account: $account_id ==="
     aws lambda list-functions \
-        --query "Functions[?LastModified>='2024-02-14'].[FunctionName,LastModified,Role]" \
+        --query "Functions[?LastModified>='2025-02-11'].[FunctionName,LastModified,Role]" \
         --output table \
         --profile "account-${account_id}" 2>/dev/null
 done

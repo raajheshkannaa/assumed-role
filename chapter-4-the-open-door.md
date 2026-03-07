@@ -44,7 +44,7 @@ Three active findings. Two are S3 bucket policies I already knew about — cross
 
 I exhale. Key revoked. Deny policy applied. Access Analyzer clean for external access. The attacker is locked out.
 
-I post to `#incident-20240314`:
+I post to `#incident-20250313`:
 
 ```
 Maya: Key AKIA...EXAMPLE deactivated. Deny-all policy applied to
@@ -90,9 +90,9 @@ aws sts get-caller-identity --profile dev-platform-assumed
 
 ```json
 {
-    "UserId": "AROAX3EXAMPLE:session-20240314",
+    "UserId": "AROAX3EXAMPLE:session-20250313",
     "Account": "293847561029",
-    "Arn": "arn:aws:sts::293847561029:assumed-role/spoke-001/session-20240314"
+    "Arn": "arn:aws:sts::293847561029:assumed-role/spoke-001/session-20250313"
 }
 ```
 
@@ -110,7 +110,7 @@ Now it was time for the distraction.
 #security-alerts
 [CRITICAL] SecurityGroup modification detected: sg-0a1b2c3d (prod-payments-037)
 Ingress rule added: 0.0.0.0/0 → TCP 5432
-Principal: arn:aws:sts::487291035561:assumed-role/spoke-001/session-20240314
+Principal: arn:aws:sts::487291035561:assumed-role/spoke-001/session-20250313
 ```
 
 My detection pipeline for security group changes fires. Someone just opened port 5432 — Postgres — to the entire internet. On the production payments RDS security group.
@@ -160,7 +160,7 @@ I pull the RDS query logs from CloudWatch Logs Insights — Postgres audit loggi
 -- CloudWatch Logs Insights query
 fields @timestamp, @message
 | filter @message like /98.47.216.103/
-| filter @timestamp > "2024-03-14T10:30:00Z"
+| filter @timestamp > "2025-03-13T10:30:00Z"
 | sort @timestamp asc
 | limit 50
 ```
@@ -170,9 +170,9 @@ There it is:
 ```
 log_time                 | user_name | database_name | query                                    | client_addr
 -------------------------+-----------+---------------+------------------------------------------+---------
-2024-03-14T10:34:52Z     | readonly  | payments_prod | SELECT * FROM customers LIMIT 100        | 98.47.216.103
-2024-03-14T10:35:01Z     | readonly  | payments_prod | SELECT COUNT(*) FROM transactions        | 98.47.216.103
-2024-03-14T10:35:08Z     | readonly  | payments_prod | SELECT table_name FROM information_schema.tables | 98.47.216.103
+2025-03-13T10:34:52Z     | readonly  | payments_prod | SELECT * FROM customers LIMIT 100        | 98.47.216.103
+2025-03-13T10:35:01Z     | readonly  | payments_prod | SELECT COUNT(*) FROM transactions        | 98.47.216.103
+2025-03-13T10:35:08Z     | readonly  | payments_prod | SELECT table_name FROM information_schema.tables | 98.47.216.103
 ```
 
 Five seconds after the SG opened, they were querying the database. Five seconds. They had the connection ready, waiting for the firewall to drop.

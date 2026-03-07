@@ -277,7 +277,7 @@ ORDER BY eventTime DESC
         "Resource": "*",
         "Condition": {
             "DateLessThan": {
-                "aws:TokenIssueTime": "2024-03-14T14:30:00Z"
+                "aws:TokenIssueTime": "2025-03-13T14:30:00Z"
             },
             "StringNotLike": {
                 "aws:PrincipalArn": [

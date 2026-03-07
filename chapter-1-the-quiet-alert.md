@@ -21,7 +21,7 @@ I grab my phone.
 ```
 #security-alerts
 [CRITICAL] StopLogging detected in prod-payments-037
-EventTime: 2024-03-14T06:11:43Z
+EventTime: 2025-03-13T06:11:43Z
 Principal: arn:aws:iam::487291035561:user/svc-payment-processor
 SourceIP: 98.47.216.103
 ```
@@ -74,7 +74,7 @@ SELECT
 FROM
     event_data_store_id
 WHERE
-    eventTime > '2024-03-14T05:00:00Z'
+    eventTime > '2025-03-13T05:00:00Z'
     AND recipientAccountId = '487291035561'
     AND userIdentity.accessKeyId = 'AKIAIOSFODNN7EXAMPLE'
 ORDER BY eventTime ASC
@@ -93,7 +93,7 @@ The results come back. I read CloudTrail events the way some people read sheet m
         "accessKeyId": "AKIAIOSFODNN7EXAMPLE",
         "userName": "svc-payment-processor"
     },
-    "eventTime": "2024-03-14T05:47:12Z",
+    "eventTime": "2025-03-13T05:47:12Z",
     "eventSource": "ec2.amazonaws.com",
     "eventName": "DescribeInstances",
     "awsRegion": "us-east-1",
@@ -106,7 +106,7 @@ Same principal, same source IP. Three more events in rapid succession: `Describe
 
 ```json
 {
-    "eventTime": "2024-03-14T06:11:43Z",
+    "eventTime": "2025-03-13T06:11:43Z",
     "eventSource": "cloudtrail.amazonaws.com",
     "eventName": "StopLogging",
     "sourceIPAddress": "98.47.216.103",
@@ -143,7 +143,7 @@ aws iam list-access-keys --user-name svc-payment-processor \
             "UserName": "svc-payment-processor",
             "AccessKeyId": "AKIAIOSFODNN7EXAMPLE",
             "Status": "Active",
-            "CreateDate": "2023-09-15T14:22:07Z"
+            "CreateDate": "2024-09-15T14:22:07Z"
         }
     ]
 }

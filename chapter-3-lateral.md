@@ -23,7 +23,7 @@ VEGA had already mapped the cross-account trust relationships. The `spoke-001` r
 ```bash
 aws sts assume-role \
     --role-arn arn:aws:iam::293847561029:role/spoke-001 \
-    --role-session-name session-20240314 \
+    --role-session-name session-20250313 \
     --profile meridian
 ```
 
@@ -33,11 +33,11 @@ aws sts assume-role \
         "AccessKeyId": "ASIAX3EXAMPLE",
         "SecretAccessKey": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
         "SessionToken": "FwoGZXIvYXdzEBYaDH...",
-        "Expiration": "2024-03-14T09:22:00Z"
+        "Expiration": "2025-03-13T13:00:00Z"
     },
     "AssumedRoleUser": {
-        "AssumedRoleId": "AROAX3EXAMPLE:session-20240314",
-        "Arn": "arn:aws:sts::293847561029:assumed-role/spoke-001/session-20240314"
+        "AssumedRoleId": "AROAX3EXAMPLE:session-20250313",
+        "Arn": "arn:aws:sts::293847561029:assumed-role/spoke-001/session-20250313"
     }
 }
 ```
@@ -80,12 +80,12 @@ curl "http://localhost:8080/proxy?url=http://169.254.169.254/latest/meta-data/ia
 ```json
 {
     "Code": "Success",
-    "LastUpdated": "2024-03-14T03:15:00Z",
+    "LastUpdated": "2025-03-13T03:15:00Z",
     "Type": "AWS-HMAC",
     "AccessKeyId": "ASIAY7EXAMPLE",
     "SecretAccessKey": "SECRET_EXAMPLE_KEY",
     "Token": "IQoJb3JpZ2luX2Vj...",
-    "Expiration": "2024-03-14T09:30:00Z"
+    "Expiration": "2025-03-13T09:15:00Z"
 }
 ```
 
@@ -108,7 +108,7 @@ SELECT
 FROM
     event_data_store_id
 WHERE
-    eventTime > '2024-03-14T02:00:00Z'
+    eventTime > '2025-03-13T02:00:00Z'
     AND eventName = 'AssumeRole'
     AND userIdentity.accessKeyId = 'AKIAIOSFODNN7EXAMPLE'
 ORDER BY eventTime ASC
@@ -119,9 +119,9 @@ The chain unfolds:
 ```
 eventTime                | recipientAccountId | requestParameters.roleArn
 -------------------------+--------------------+------------------------------------------
-2024-03-14T03:19:00Z     | 293847561029       | arn:aws:iam::293847561029:role/spoke-001
-2024-03-14T03:31:00Z     | 384756102938       | arn:aws:iam::384756102938:role/spoke-001
-2024-03-14T03:44:00Z     | 561029384756       | arn:aws:iam::561029384756:role/spoke-001
+2025-03-13T03:19:00Z     | 293847561029       | arn:aws:iam::293847561029:role/spoke-001
+2025-03-13T03:31:00Z     | 384756102938       | arn:aws:iam::384756102938:role/spoke-001
+2025-03-13T03:44:00Z     | 561029384756       | arn:aws:iam::561029384756:role/spoke-001
 ```
 
 Three accounts. They jumped from `prod-payments` into `dev-platform-012`, then `staging-data-019`, then `prod-datalake-031`. Each hop used `spoke-001`. My hub-spoke model is now their highway.
@@ -138,7 +138,7 @@ SELECT
 FROM
     event_data_store_id
 WHERE
-    eventTime > '2024-03-14T03:00:00Z'
+    eventTime > '2025-03-13T03:00:00Z'
     AND recipientAccountId IN ('293847561029', '384756102938', '561029384756')
     AND userIdentity.sessionContext.sessionIssuer.arn LIKE '%spoke-001%'
 ORDER BY eventTime ASC
@@ -181,7 +181,7 @@ I open a DM to Kira. She's the senior dev on the payments team. We've talked may
 ```
 Maya: Kira, I know it's 4 AM. I'm sorry. We have an active security
 incident in prod-payments. I need someone who understands the payment
-service architecture. Can you join #incident-20240314?
+service architecture. Can you join #incident-20250313?
 ```
 
 She responds in three minutes. Three minutes at 4 AM on a Thursday.
@@ -237,7 +237,7 @@ FROM
     s3_access_logs_db.meridian_txn_archive_logs
 WHERE
     bucket_name = 'meridian-txn-archive'
-    AND parse_datetime(request_time, 'dd/MMM/yyyy:HH:mm:ss Z') > timestamp '2024-03-14 05:00:00'
+    AND parse_datetime(request_time, 'dd/MMM/yyyy:HH:mm:ss Z') > timestamp '2025-03-13 05:00:00'
     AND remote_ip = '98.47.216.103'
 ORDER BY request_time ASC
 ```

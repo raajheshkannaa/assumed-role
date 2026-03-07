@@ -143,7 +143,7 @@ SELECT
 FROM
     event_data_store_id
 WHERE
-    eventTime > '2024-03-12T00:00:00Z'
+    eventTime > '2025-03-11T00:00:00Z'
     AND userIdentity.accessKeyId = 'AKIAIOSFODNN7EXAMPLE'
 ORDER BY eventTime ASC
 ```
@@ -187,7 +187,7 @@ The flow logs show connections to port 443 — API calls. No surprise. But also 
 
 I need to tell Rohan.
 
-I open Slack and create a private channel: `#incident-20240314`. I add Rohan and type a message I've been hoping I'd never have to type:
+I open Slack and create a private channel: `#incident-20250313`. I add Rohan and type a message I've been hoping I'd never have to type:
 
 > We have a problem. Active compromise in prod-payments. Credentials belong to svc-payment-processor — access key created Sept 2023, never rotated. Attacker disabled CloudTrail, performed recon across multiple accounts over the last 2 weeks. Source IP is residential, not corporate. This is not a drill.
 

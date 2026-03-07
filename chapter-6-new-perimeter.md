@@ -2,7 +2,7 @@
 
 ---
 
-6:58 AM. Thursday. Bucharest.
+2:12 PM. Thursday. Bucharest.
 
 VEGA opened a terminal and ran a count on the objects landing in his destination bucket. 847,000 transaction records and climbing. The replication was still running — AWS copying files silently, dutifully, the way it was designed to.
 
@@ -82,7 +82,7 @@ This is the SCP. The one I've been asking to deploy for six months. The one that
             "Resource": "*",
             "Condition": {
                 "DateLessThan": {
-                    "aws:TokenIssueTime": "2024-03-14T14:30:00Z"
+                    "aws:TokenIssueTime": "2025-03-13T14:30:00Z"
                 }
             }
         }
@@ -95,7 +95,7 @@ I deploy it to the compromised accounts — `prod-payments-037`, `dev-platform-0
 ```bash
 aws organizations create-policy \
     --name "EmergencySessionRevocation" \
-    --description "Revoke all sessions issued before 2024-03-14T14:30:00Z" \
+    --description "Revoke all sessions issued before 2025-03-13T14:30:00Z" \
     --type SERVICE_CONTROL_POLICY \
     --content file://revoke-sessions-scp.json \
     --profile management
@@ -117,7 +117,7 @@ And then I make my third mistake.
 10:51 AM. Thursday.
 
 ```
-#incident-20240314
+#incident-20250313
 Kira: Maya — the payments deploy pipeline just failed. All CI/CD
 actions are being denied. The SCP is blocking the pipeline's
 assumed role sessions.
@@ -147,7 +147,7 @@ She rewrites the SCP:
             "Resource": "*",
             "Condition": {
                 "DateLessThan": {
-                    "aws:TokenIssueTime": "2024-03-14T14:30:00Z"
+                    "aws:TokenIssueTime": "2025-03-13T14:30:00Z"
                 },
                 "StringNotLike": {
                     "aws:PrincipalArn": [
@@ -233,22 +233,22 @@ Step seven: preserve the evidence.
 # Copy all CloudTrail logs for the incident timeframe to a forensic account
 aws s3 sync \
     s3://meridian-cloudtrail-logs/AWSLogs/ \
-    s3://meridian-forensic-evidence/incident-20240314/cloudtrail/ \
-    --include "*2024-03-0*" --include "*2024-03-1*" \
+    s3://meridian-forensic-evidence/incident-20250313/cloudtrail/ \
+    --include "*2025-03-0*" --include "*2025-03-1*" \
     --profile forensic-account
 
 # Copy VPC Flow Logs
 aws s3 sync \
     s3://meridian-vpc-flow-logs/ \
-    s3://meridian-forensic-evidence/incident-20240314/vpc-flow-logs/ \
-    --include "*2024-03-1*" \
+    s3://meridian-forensic-evidence/incident-20250313/vpc-flow-logs/ \
+    --include "*2025-03-1*" \
     --profile forensic-account
 
 # Copy S3 server access logs
 aws s3 sync \
     s3://meridian-s3-access-logs/ \
-    s3://meridian-forensic-evidence/incident-20240314/s3-access-logs/ \
-    --include "*2024-03-1*" \
+    s3://meridian-forensic-evidence/incident-20250313/s3-access-logs/ \
+    --include "*2025-03-1*" \
     --profile forensic-account
 ```
 
@@ -268,7 +268,7 @@ things your security engineer already knows but hasn't fixed. I'm
 including CloudTrail event IDs so she can verify each one.
 
 1. Service account keys with no rotation policy
-   (svc-payment-processor: last rotated never. Created 2023-09-15.
+   (svc-payment-processor: last rotated never. Created 2024-09-15.
    EventId: a1b2c3d4-e5f6-7890-abcd-ef1234567890)
 
 2. IMDSv1 on production EC2 instances
@@ -335,7 +335,7 @@ The CTO — who has been silent — asks the question executives always ask: "Ca
 
 Sara nods. The CTO looks at Rohan. Rohan looks at me.
 
-"We passed our SOC 2 audit three months ago," I tell them. "During that audit, the attacker was already inside our environment. VEGA created the backdoor IAM user on March 11th. Our SOC 2 Type II observation period ended February 28th. Compliance isn't security. It never was."
+"We passed our SOC 2 audit three months ago," I tell them. "During that audit, the attacker was already inside our environment. VEGA created the backdoor IAM user on March 10th. Our SOC 2 Type II observation period ended February 28th. Compliance isn't security. It never was."
 
 I lay out the remediation plan:
 
@@ -402,7 +402,7 @@ I check the alert. My new detection — `CreateAccessKey` — firing on the sand
 ```
 #security-alerts
 [HIGH] CreateAccessKey detected in sandbox-platform-041
-EventTime: 2024-03-21T06:02:17Z
+EventTime: 2025-03-20T06:02:17Z
 Principal: arn:aws:iam::738495061728:user/dev-sandbox-user
 SourceIP: 10.0.47.128 (internal VPN)
 NewKeyId: AKIAEXAMPLESANDBOX01
