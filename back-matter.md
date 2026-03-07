@@ -48,7 +48,7 @@ A notification chimed. Someone had entered the listing's private chat. A buyer. 
 
 He pulled up the transaction history.
 
-Purchased: AWS IAM access key. Organization: Meridian Financial. Date: September 2023.
+Purchased: AWS IAM access key. Organization: Meridian Financial. Date: February 2025.
 
 The buyer's message was one word:
 
