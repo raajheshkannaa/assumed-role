@@ -20,7 +20,9 @@ The radiator ticked.
 
 ---
 
-10:34 AM. Thursday.
+10:34 AM. Thursday. Toronto.
+
+While VEGA counted records in Bucharest, I was already dismantling his infrastructure.
 
 Containment. Systematic. Step by step.
 
