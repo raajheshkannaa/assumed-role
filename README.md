@@ -47,4 +47,4 @@ You can't defend what you can't see. Compliance isn't security. And no one perso
 
 ## License
 
-© 2025 rK. Licensed under [Creative Commons BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). Share freely. Attribute the author. No commercial use without permission.
+© 2026 Raajhesh Kannaa Chidambaram. Licensed under [Creative Commons BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). Share freely. Attribute the author. No commercial use without permission.

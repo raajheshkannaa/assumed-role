@@ -210,6 +210,85 @@ class CodeBlock(Flowable):
             y -= self.style.leading
 
 
+class BookArt(Flowable):
+    """Larger art piece for the front of the book — represents the whole story."""
+
+    ART_H = 108  # 1.5 inches tall
+
+    def wrap(self, availWidth, availHeight):
+        self.avail = availWidth
+        return (availWidth, self.ART_H + 24)
+
+    def draw(self):
+        c = self.canv
+        w = self.avail
+        h = self.ART_H
+        cx = w / 2
+        cy = h / 2 + 12
+
+        # Dark background strip with rounded corners
+        c.setFillColor(BG_CODE)
+        c.roundRect(0, 6, w, h + 12, 6, fill=1, stroke=0)
+
+        # Concentric hexagonal rings — defense in depth, the perimeter
+        # Outer rings: dim, geometric, orderly (the infrastructure)
+        for ring in range(5, 0, -1):
+            r = 12 + ring * 9
+            sides = 6
+            v = 0.12 + 0.06 * (5 - ring) / 4
+            c.setStrokeColor(Color(v * 0.7, v * 0.74, v * 0.88))
+            c.setLineWidth(0.4 + 0.1 * (5 - ring) / 4)
+            if ring > 3:
+                c.setDash(1.5, 3)
+            else:
+                c.setDash()
+            p = c.beginPath()
+            for i in range(sides + 1):
+                angle = math.radians(60 * i - 30)
+                x = cx + r * math.cos(angle)
+                y = cy + r * math.sin(angle)
+                if i == 0:
+                    p.moveTo(x, y)
+                else:
+                    p.lineTo(x, y)
+            c.drawPath(p, fill=0, stroke=1)
+        c.setDash()
+
+        # The breach — a red fracture line cutting through the rings
+        c.setStrokeColor(RED_ACCENT)
+        c.setLineWidth(1.4)
+        fracture_pts = [
+            (cx + 6, cy + 46), (cx + 3, cy + 28), (cx + 8, cy + 14),
+            (cx + 2, cy + 4), (cx + 5, cy - 8), (cx + 1, cy - 20),
+            (cx + 7, cy - 32), (cx + 3, cy - 44),
+        ]
+        p = c.beginPath()
+        p.moveTo(*fracture_pts[0])
+        for pt in fracture_pts[1:]:
+            p.lineTo(*pt)
+        c.drawPath(p, fill=0, stroke=1)
+
+        # Red glow particles along the fracture
+        import random
+        rng = random.Random(99)
+        for fx, fy in fracture_pts:
+            for _ in range(3):
+                px = fx + rng.uniform(-6, 6)
+                py = fy + rng.uniform(-4, 4)
+                sz = rng.uniform(0.6, 1.8)
+                intensity = rng.uniform(0.3, 0.9)
+                c.setFillColor(Color(0.82 * intensity, 0.11 * intensity, 0.09 * intensity))
+                c.circle(px, py, sz, fill=1, stroke=0)
+
+        # Center: a single bright node — the defender
+        c.setFillColor(Color(0.80, 0.82, 0.87))
+        c.circle(cx, cy, 3, fill=1, stroke=0)
+        # Faint halo
+        c.setStrokeColor(Color(0.40, 0.42, 0.50))
+        c.setLineWidth(0.4)
+        c.circle(cx, cy, 7, fill=0, stroke=1)
+
+
 class ChapterArt(Flowable):
     """Small abstract art piece at chapter opening. Terminal Noir aesthetic."""
 
@@ -231,9 +310,9 @@ class ChapterArt(Flowable):
         cx = w / 2
         cy = h / 2 + 8
 
-        # Dark background strip
+        # Dark background strip with rounded corners
         c.setFillColor(BG_CODE)
-        c.roundRect(0, 4, w, h + 8, 4, fill=1, stroke=0)
+        c.roundRect(0, 4, w, h + 8, 6, fill=1, stroke=0)
 
         dispatch = {
             1: self._draw_alert,
@@ -338,13 +417,13 @@ class ChapterArt(Flowable):
             if i == door_idx:
                 # The gap — draw faint red glow
                 c.setFillColor(Color(0.25, 0.04, 0.03))
-                c.rect(x - 2, cy - 22, bar_w + 4, 44, fill=1, stroke=0)
+                c.roundRect(x - 2, cy - 22, bar_w + 4, 44, 1.5, fill=1, stroke=0)
                 continue
             # Bars get dimmer further from the gap
             dist = abs(i - door_idx)
             v = max(0.15, 0.50 - dist * 0.035)
             c.setFillColor(Color(v * 0.7, v * 0.72, v * 0.82))
-            c.rect(x, cy - 20, bar_w, 40, fill=1, stroke=0)
+            c.roundRect(x, cy - 20, bar_w, 40, 1, fill=1, stroke=0)
 
     def _draw_ghosts(self, c, cx, cy, w, h):
         """Ch 5: Overlapping rectangles with decreasing opacity — persistence layers."""
@@ -361,13 +440,13 @@ class ChapterArt(Flowable):
                 c.setStrokeColor(RED_ACCENT)
                 c.setLineWidth(0.8)
                 c.setFillColor(Color(0.10, 0.02, 0.02))
-                c.rect(rx, ry, rw, rh, fill=1, stroke=1)
+                c.roundRect(rx, ry, rw, rh, 3, fill=1, stroke=1)
             else:
                 v = 0.10 + t * 0.12
                 c.setStrokeColor(Color(v + 0.1, v + 0.12, v + 0.18))
                 c.setLineWidth(0.4)
                 c.setFillColor(Color(v * 0.6, v * 0.62, v * 0.7))
-                c.rect(rx, ry, rw, rh, fill=1, stroke=1)
+                c.roundRect(rx, ry, rw, rh, 3, fill=1, stroke=1)
 
     def _draw_perimeter(self, c, cx, cy, w, h):
         """Ch 6: Broken circle reforming — the new perimeter."""
@@ -587,12 +666,22 @@ def build():
     )))
     story.append(PageBreak())
 
-    # --- Page 2: Disclaimer ---
+    # --- Page 2: Disclaimer with book art ---
+    story.append(Spacer(1, 80))
+    story.append(BookArt())
+    story.append(Spacer(1, 40))
     story.append(Paragraph(
         "This is fiction. The techniques are real. Every CloudTrail event, "
         "SQL query, CLI command, and IAM policy in this book is executable. "
         "Use them to defend things.",
         styles["disclaimer"]
+    ))
+    story.append(Spacer(1, 24))
+    story.append(Paragraph(
+        "\u00a9 2026 Raajhesh Kannaa Chidambaram. Licensed under Creative Commons BY-NC-SA 4.0. "
+        "Share freely. Attribute the author. No commercial use without permission.",
+        ParagraphStyle("license", fontName="JetBrains", fontSize=5.5, leading=8.5,
+                       textColor=TEXT_DIM, alignment=TA_CENTER)
     ))
     story.append(PageBreak())
 
@@ -638,6 +727,69 @@ def build():
     for i, para in enumerate(note_paras):
         s = styles["author_note_body"] if i == 0 else styles["body_indent"]
         story.append(Paragraph(para, s))
+
+    story.append(PageBreak())
+
+    # --- Post-credits scene ---
+    story.append(Spacer(1, 60))
+
+    postcredit_scene = [
+        ("scene_break", None),
+        ("body", "Friday. 11:47 PM. Somewhere with good Wi-Fi."),
+        ("body", "The admin of Cerberus Market \u2014 \u201cThe Professional\u2019s Exchange,\u201d "
+         "according to the landing page nobody believed \u2014 was having a bad night. "
+         "A buyer had left a one-star review on a batch of Shopify API keys. "
+         "\u201cExpired within 24 hours. Unacceptable for the price point.\u201d The admin "
+         "typed a response with the weary patience of a customer service rep at a "
+         "company that happened to be a federal crime: \u201cAll sales are final. Please "
+         "review our freshness guarantee before purchasing.\u201d"),
+        ("body", "He refunded them anyway. Reputation mattered, even here."),
+        ("body", "The K-drama on his second monitor was getting good \u2014 the lead had "
+         "just discovered her business partner was embezzling \u2014 but he paused it. "
+         "New listing notification. Priority seller."),
+        ("body", "He clicked through."),
+        ("code", "LISTING #4,891\n"
+         "Category: CI/CD Pipeline Access\n"
+         "Organization: [REDACTED] \u2014 Healthcare SaaS Platform\n"
+         "Pipeline: GitHub Actions \u2192 Production\n"
+         "Deployment footprint: ~400 hospital systems (US)\n"
+         "Asset: RSA-4096 code signing key (expires 2027)\n"
+         "Includes: Workflow files, deploy credentials, artifact registry token\n"
+         "Verification: Seller demonstrated signed artifact acceptance in staging\n"
+         "Price: Negotiable"),
+        ("body", "The admin stopped chewing his ramen."),
+        ("body", "This wasn\u2019t API keys to some startup\u2019s sandbox account. This was the key "
+         "that signed software hospitals trusted. Software that ran on machines connected "
+         "to patient networks, pharmacy dispensing systems, EHR platforms. Every update "
+         "signed with this key would install automatically. Routine maintenance. Trusted source."),
+        ("body", "Four hundred hospitals. One signing key. Zero questions asked at the other end."),
+        ("body", "He should take it down. That was the smart move. Law enforcement ignored "
+         "credential listings \u2014 they were noise, thousands per week. But healthcare made "
+         "headlines. Headlines brought task forces. Task forces killed marketplaces."),
+        ("body", "His hand moved toward the moderation panel."),
+        ("body", "A notification chimed. Someone had entered the listing\u2019s private chat. "
+         "A buyer. He checked their profile: account created two years ago, one previous purchase."),
+        ("body", "He pulled up the transaction history."),
+        ("body", "Purchased: AWS IAM access key. Organization: Meridian Financial. Date: February 2025."),
+        ("body", "The buyer\u2019s message was one word:"),
+        ("body_italic", "\u201cPrice.\u201d"),
+        ("body", "The admin looked at the moderation panel. Looked at the listing. "
+         "Looked at the buyer\u2019s history. Looked at the K-drama, frozen on the "
+         "embezzlement reveal."),
+        ("body", "He put his headphones back on and pressed play."),
+    ]
+
+    for ptype, text in postcredit_scene:
+        if ptype == "scene_break":
+            story.append(SceneBreak())
+        elif ptype == "code":
+            story.append(CodeBlock(text, styles["code"]))
+        elif ptype == "body_italic":
+            story.append(Paragraph(
+                f"<i>{text}</i>", styles["body_indent"]
+            ))
+        else:
+            story.append(Paragraph(text, styles["body_indent"]))
 
     story.append(PageBreak())
 
