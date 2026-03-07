@@ -9,7 +9,3 @@ Maya is fictional. Her situation isn't. Most companies her size have one person 
 If you recognized the techniques in this book, you're probably that person. Build the detections. Automate the responses. Push for temporary access. And hire a second engineer before you need one.
 
 The tools Maya built exist. Search for them.
-
-## About the Author
-
-rK is a cloud security engineer who builds open-source AWS security tools — the kind Maya wishes she had. Based in Toronto. Writes detections at 2 AM because the alternative is worse.
