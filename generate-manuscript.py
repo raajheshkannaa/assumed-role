@@ -306,6 +306,15 @@ class BookArt(Flowable):
                 c.setFillColor(Color(v * 0.7, v * 0.74, v * 0.85))
                 c.circle(nx, ny, 1.5, fill=1, stroke=0)
 
+        # --- Faint red glow wash behind fracture (drawn first so fracture is on top) ---
+        for gi in range(20, 0, -1):
+            gr = gi * 2.5
+            alpha = 0.015 * (20 - gi) / 20
+            c.setFillColor(Color(0.82 * alpha + BG_CODE.red * (1 - alpha),
+                                 0.11 * alpha + BG_CODE.green * (1 - alpha),
+                                 0.09 * alpha + BG_CODE.blue * (1 - alpha)))
+            c.circle(cx + 4, cy, gr, fill=1, stroke=0)
+
         # --- The breach — red fracture cutting top to bottom ---
         c.setStrokeColor(RED_ACCENT)
         c.setLineWidth(1.6)
@@ -331,15 +340,6 @@ class BookArt(Flowable):
                 intensity = rng2.uniform(0.2, 0.95)
                 c.setFillColor(Color(0.82 * intensity, 0.11 * intensity, 0.09 * intensity))
                 c.circle(px, py, sz, fill=1, stroke=0)
-
-        # --- Faint red glow wash behind fracture center ---
-        for gi in range(20, 0, -1):
-            gr = gi * 2.5
-            alpha = 0.015 * (20 - gi) / 20
-            c.setFillColor(Color(0.82 * alpha + BG_CODE.red * (1 - alpha),
-                                 0.11 * alpha + BG_CODE.green * (1 - alpha),
-                                 0.09 * alpha + BG_CODE.blue * (1 - alpha)))
-            c.circle(cx + 4, cy, gr, fill=1, stroke=0)
 
         # --- Center: the defender node ---
         # Outer halo
