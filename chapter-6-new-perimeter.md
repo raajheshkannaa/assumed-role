@@ -328,7 +328,7 @@ The head of legal — Sara — speaks first. "How much customer data was exposed
 
 "Fourteen months of transaction records. Customer names, payment amounts, partial card numbers, billing addresses. PCI tokenization protected the full card data, but what was exposed is enough to trigger state breach notification laws in every jurisdiction where we have customers."
 
-The room goes quiet. Sara writes something on her pad without looking up. "We need to notify affected customers within 72 hours under CCPA. 60 days under most state laws. We need outside counsel."
+The room goes quiet. Sara writes something on her pad without looking up. "We need to notify without unreasonable delay — most state laws give us 30 to 60 days, but with this volume, outside counsel needs to start today."
 
 She flips the pad around so I can see it. A column of numbers in neat handwriting. "Preliminary estimate: breach notification, outside counsel, credit monitoring for affected customers, regulatory fines, customer churn. Conservative range is three to five million." She pauses. "That's fifteen times what a second security hire would have cost over the same period."
 
