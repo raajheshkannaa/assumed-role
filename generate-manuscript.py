@@ -737,8 +737,8 @@ def build():
     story.append(BookArt())
     story.append(Spacer(1, 30))
     story.append(Paragraph(
-        "This is fiction. The techniques are real. Every CloudTrail event, "
-        "SQL query, CLI command, and IAM policy in this book is executable. "
+        "This is fiction. The techniques are real. Every CloudTrail event is a real "
+        "log structure. Every SQL query, CLI command, and IAM policy is functional. "
         "Use them to defend things.",
         styles["disclaimer"]
     ))
