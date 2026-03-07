@@ -52,7 +52,7 @@ But one entry freezes my blood.
     "sourceIPAddress": "104.28.193.47",
     "userIdentity": {
         "type": "AssumedRole",
-        "arn": "arn:aws:sts::192837465019:assumed-role/spoke-001/session-0311"
+        "arn": "arn:aws:sts::192837465019:assumed-role/spoke-001/session-0310"
     },
     "requestParameters": {
         "userName": "svc-monitoring-agent"
@@ -68,7 +68,7 @@ But one entry freezes my blood.
 }
 ```
 
-March 11th. Three days ago. Account `192837465019` — the security tooling account. *My* account. The one that runs my detection pipeline, my CloudTrail Lake queries, my EventBridge rules.
+March 10th. Three days ago. Account `192837465019` — the security tooling account. *My* account. The one that runs my detection pipeline, my CloudTrail Lake queries, my EventBridge rules.
 
 The attacker created a user called `svc-monitoring-agent` in my security tooling account. Three days ago. While I was doing my regular work, reviewing Prowler findings, fixing IAM permissions, living my normal life.
 
@@ -167,6 +167,8 @@ A Lambda function called `monitoring-credential-refresh` with an EventBridge rul
 
 He built automation inside my automation account. He used my own infrastructure pattern against me.
 
+He'd built a program inside my own security account that automatically gave him fresh credentials every six hours. A self-healing backdoor.
+
 ---
 
 7:31 AM. Thursday.
@@ -228,7 +230,7 @@ VEGA knew this. He studied my detections. He admired them, probably. And then he
 
 9:02 AM. Thursday.
 
-The logs tell a story when you read them chronologically. The original access key was created September 15, 2023. Marcus Chen's last week at Meridian was September 18-22. The key was created three days before his final week — he exported it to debug a weekend deployment issue and never deleted it.
+The logs tell a story when you read them chronologically. The original access key was created September 15, 2024. Marcus Chen's last week at Meridian was September 18-22, 2024. The key was created three days before his final week — he exported it to debug a weekend deployment issue and never deleted it.
 
 I check Identity Center:
 

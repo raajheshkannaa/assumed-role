@@ -121,6 +121,8 @@ STS sessions. Assumed role sessions survive key revocation.
 
 The realization hits me like a physical force. I revoked the key and thought I'd won. But the attacker assumed roles *before* I revoked the key, and those session tokens are still alive. They'll stay alive for hours. Key revocation is the right move. It's also insufficient.
 
+Revoking the key was like changing the lock after someone already copied the house key — their copies still worked.
+
 I revert the security group change immediately. My ChatOps automation handles it — the Lambda detects the modification, posts to Slack with a "Deny" button, I hit the button, and it reverts within 90 seconds:
 
 ```json
@@ -148,7 +150,7 @@ aws configservice get-compliance-details-by-config-rule \
     --profile prod-payments
 ```
 
-Empty. Config hasn't evaluated yet. Its periodic evaluation cycle — every 1 to 3 hours for most rules — means the security group was modified and reverted within Config's evaluation window. The tool worked as designed. The design has a multi-hour gap.
+Empty. Config evaluates on configuration changes — but the security group was modified and reverted within seconds. If Config didn't record the intermediate state, the non-compliant configuration never existed in its timeline. The tool worked as designed. The design trusts that changes persist long enough to be observed.
 
 I knew this. I wrote a blog post about this. I still got burned by it.
 

@@ -1,2 +1,2 @@
-generate-manuscript.py
-generate-cover.py
+*.py
+assumed-role-manuscript.pdf

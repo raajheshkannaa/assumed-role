@@ -202,7 +202,7 @@ for instance_id in i-0a1b2c3d4e5f6g7 i-0h8i9j0k1l2m3n4 i-0v2w3x4y5z6a7b8; do
 done
 ```
 
-The Prowler finding I ignored for three months. Remediated in thirty seconds. Three months of "next quarter" resolved with one CLI command per instance.
+The Prowler finding I ignored for three months. Remediated in thirty seconds. Three months of deferrals resolved with one CLI command per instance.
 
 Step six: rotate every service account key in the compromised accounts.
 
@@ -303,7 +303,7 @@ You're welcome.
 
 I read it three times.
 
-Four of the five are things I already knew. Things I had in my backlog. Things that were "next quarter." Things in a spreadsheet I promised myself I'd get to.
+Four of the five are things I already knew. Things I had in my backlog. Things in a spreadsheet I promised myself I'd get to.
 
 He's not wrong. That's the worst part. He's not wrong about any of it. He's just wrong about what it justifies.
 
@@ -342,7 +342,7 @@ I lay out the remediation plan:
 **Immediate (this week):**
 - Temporary access only — just-in-time access provisioned through Identity Center with automatic expiration. No permanent admin keys for human users. No exceptions.
 - Access key lifecycle automation — when an Identity Center session is deprovisioned, all associated programmatic keys are deactivated automatically. The lifecycle gap that Marcus exploited dies.
-- IMDSv2 enforcement — organization-wide SCP. Not per-instance metadata options that can be overridden. An SCP that denies `ec2:RunInstances` and `ec2:ModifyInstanceMetadataOptions` unless `HttpTokens` is `required`. No exceptions. No "next quarter."
+- IMDSv2 enforcement — organization-wide SCP. Not per-instance metadata options that can be overridden. An SCP that denies `ec2:RunInstances` and `ec2:ModifyInstanceMetadataOptions` unless `HttpTokens` is `required`. No exceptions.
 
 **This month:**
 - S3 replication monitoring — CloudTrail Lake detection for any `PutBucketReplication` event where the destination account is not in our organization. Alerting within minutes, not hours.

@@ -149,7 +149,7 @@ aws iam list-access-keys --user-name svc-payment-processor \
 }
 ```
 
-Created September 15, 2023. Six months ago. Never rotated. `Status: Active`.
+Created September 15, 2024. Six months ago. Never rotated. `Status: Active`.
 
 I already know this is bad. You're reading this thinking "just revoke the key." Yeah. I thought that too. Hold that thought.
 

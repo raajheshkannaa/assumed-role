@@ -126,6 +126,8 @@ eventTime                | recipientAccountId | requestParameters.roleArn
 
 Three accounts. They jumped from `prod-payments` into `dev-platform-012`, then `staging-data-019`, then `prod-datalake-031`. Each hop used `spoke-001`. My hub-spoke model is now their highway.
 
+In plain terms: VEGA used one stolen key to unlock doors across a dozen accounts, each one giving him access to the next.
+
 I dig deeper. What did they do in each account?
 
 ```sql

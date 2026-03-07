@@ -91,9 +91,9 @@ VEGA spent four days studying the environment. Patient. Mapping. Making notes.
 
 At 2 AM on the third night, he closed his laptop and stared at the ceiling of his studio apartment in Bucharest. The radiator ticked. A dog barked somewhere below. He thought about a company he'd worked at three years ago — a healthcare startup in Lisbon, fifty people, moving fast, skipping security reviews because the product needed to ship. He'd been their DevOps lead. He'd flagged the same gaps he was seeing now at Meridian: overpermissive roles, unrotated keys, no detection for the quiet stuff. His manager had said "we'll get to it next quarter." They never did. When the ransomware hit, VEGA — his real name didn't matter anymore — watched patient records leak onto a Telegram channel while executives drafted press statements about "taking security seriously."
 
-He'd quit the next week. Not to become a criminal. To become something the industry didn't have a name for. An uninvited auditor. A proof of concept that the gaps are real and the consequences are not theoretical. The money from credential sales paid his rent. The work itself was the point.
+He'd quit the next week. The money from credential sales paid his rent. The work itself was the point.
 
-He knew this logic had a flaw. He knew it the way smokers know cigarettes kill. The data he exfiltrated belonged to people, not companies. But the companies weren't going to fix this on their own. They'd passed their SOC 2. They'd checked the box. They'd sleep soundly until someone like him showed them what the checkbox actually covered.
+He knew this logic had a flaw. He knew it the way smokers know cigarettes kill. The data he exfiltrated belonged to people, not companies. But the companies weren't going to fix this on their own. They'd passed their SOC 2. They'd checked the box.
 
 Most people rush. That's how they get caught.
 
@@ -189,7 +189,7 @@ I need to tell Erik.
 
 I open Slack and create a private channel: `#incident-20250313`. I add Erik and type a message I've been hoping I'd never have to type:
 
-> We have a problem. Active compromise in prod-payments. Credentials belong to svc-payment-processor — access key created Sept 2023, never rotated. Attacker disabled CloudTrail, performed recon across multiple accounts over the last 2 weeks. Source IP is residential, not corporate. This is not a drill.
+> We have a problem. Active compromise in prod-payments. Credentials belong to svc-payment-processor — access key created Sept 2024, never rotated. Attacker disabled CloudTrail, performed recon across multiple accounts over the last 2 weeks. Source IP is residential, not corporate. This is not a drill.
 
 I think about the Cloudflare Thanksgiving incident. November 2023. Cloudflare discovered that threat actors had used authentication tokens from the Okta breach — tokens that were never rotated after the initial compromise. The tokens were months old. Still active. Cloudflare's team caught it because they were paranoid enough to check. It took them eleven days to fully contain.
 
