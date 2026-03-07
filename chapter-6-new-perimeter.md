@@ -8,7 +8,7 @@ VEGA opened a terminal and ran a count on the objects landing in his destination
 
 He should have felt triumphant. This was clean work. No malware, no zero-days, no traces that couldn't be explained as normal operations. Just AWS doing what AWS does, pointed in a direction nobody was watching.
 
-Instead, he opened a browser tab and navigated to Meridian's About page. Team photos from an offsite. A blog post about their charity hackathon. A headshot of someone named Priya holding a trophy. He closed the tab.
+Instead, he opened a browser tab and navigated to Meridian's About page. Team photos from an offsite. A blog post about their charity hackathon. A headshot of someone named Lena holding a trophy. He closed the tab.
 
 The radiator ticked. The dog downstairs was quiet this morning.
 
@@ -317,7 +317,7 @@ You don't get to decide the cost of proving a point with other people's lives.
 
 4:00 PM. Thursday.
 
-I present to Rohan, the CTO, and the head of legal. Not with fear — with a plan and a timeline.
+I present to Erik, the CTO, and the head of legal. Not with fear — with a plan and a timeline.
 
 The head of legal — Sara — speaks first. "How much customer data was exposed?"
 
@@ -333,7 +333,7 @@ The CTO — who has been silent — asks the question executives always ask: "Ca
 
 "No." I don't soften it. "The data left our environment via S3 replication to an external account. We don't control that account. We have no way to confirm deletion. This is a reportable breach. If we try to bury it and it comes out later — and it will — the regulatory response will be worse than the breach."
 
-Sara nods. The CTO looks at Rohan. Rohan looks at me.
+Sara nods. The CTO looks at Erik. Erik looks at me.
 
 "We passed our SOC 2 audit three months ago," I tell them. "During that audit, the attacker was already inside our environment. VEGA created the backdoor IAM user on March 10th. Our SOC 2 Type II observation period ended February 28th. Compliance isn't security. It never was."
 
@@ -352,7 +352,7 @@ I lay out the remediation plan:
 **This quarter:**
 - A second security hire. Non-negotiable. I've been saying this for a year. Today is the evidence.
 
-Rohan is quiet for a long time. Then:
+Erik is quiet for a long time. Then:
 
 "Draft the job listing tonight. I'll post it tomorrow."
 

@@ -52,10 +52,10 @@ svc-payment-processor. Access Analyzer shows no external access paths.
 Running full IAM credential report now.
 ```
 
-Rohan is awake. He responds:
+Erik is awake. He responds:
 
 ```
-Rohan: Great work Maya. Let me know if you need anything.
+Erik: Great work Maya. Let me know if you need anything.
 ```
 
 Need anything. I need a security team. I need a CISO. I need the six months of "not justified this quarter" decisions reversed. But sure, I'll let you know.

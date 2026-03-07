@@ -321,7 +321,7 @@ ORDER BY eventTime DESC
 | **Capital One** | 2019 | SSRF → IMDSv1 → S3 exfil. Same vulnerability class VEGA exploited |
 | **Uber** | 2022 | Contractor targeted via MFA fatigue (Lapsus$). Social engineering + lateral movement |
 | **Cloudflare Thanksgiving** | 2023 | Un-rotated Okta tokens. Mirrors Marcus's un-revoked access key |
-| **Change Healthcare** | 2024 | Single credential, no MFA. Maya cites this to Rohan |
+| **Change Healthcare** | 2024 | Single credential, no MFA. Maya cites this to Erik |
 | **MGM/Caesars** | 2023 | Social engineering help desk for MFA reset. Identity provider abuse |
 | **Microsoft Midnight Blizzard** | 2024 | OAuth app abuse in legacy test tenant. Parallels VEGA finding gaps in less-monitored accounts |
 | **CircleCI** | 2023 | Stolen engineer credential → customer secret exposure |

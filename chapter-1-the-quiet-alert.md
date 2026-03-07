@@ -10,7 +10,7 @@ Slack notification. `#security-alerts`. A channel with exactly one subscriber.
 
 Me.
 
-I should introduce myself. I'm Maya. I'm the security team at Meridian Financial. The entire security team. Me, my laptop, and a Slack channel nobody reads. I report to Rohan, the VP of Engineering, who reports to the CTO, who reports to the CEO, who reports to the board, who reports to their golf buddies that they invested in a fintech startup with "robust security posture." That's me. I'm the robust security posture.
+I should introduce myself. I'm Maya. I'm the security team at Meridian Financial. The entire security team. Me, my laptop, and a Slack channel nobody reads. I report to Erik, the VP of Engineering, who reports to the CTO, who reports to the CEO, who reports to the board, who reports to their golf buddies that they invested in a fintech startup with "robust security posture." That's me. I'm the robust security posture.
 
 My mother calls every Sunday from Hyderabad. She asks if I'm eating properly. I tell her yes. She asks if I'm sleeping properly. I change the subject. She doesn't know what CloudTrail is. She knows her daughter works too hard.
 
@@ -34,13 +34,13 @@ I'm awake now.
 
 ---
 
-Six hours earlier, I was fixing someone else's problem. That's not a complaint — it's just the shape of my days. Priya from the platform team had a deploy queued for Friday morning and her IAM role was missing `ssm:GetParameter` permissions. She'd pinged `#platform-help` at 4 PM, gotten one emoji reaction and no answers. By 8 PM, nobody had responded. I saw it at 11 PM, traced the issue to a permission boundary I'd applied last month to tighten service account scope, added the exception, tested it, sent Priya a DM: "Should be good now — the boundary was blocking SSM reads. I updated it."
+Six hours earlier, I was fixing someone else's problem. That's not a complaint — it's just the shape of my days. Lena from the platform team had a deploy queued for Friday morning and her IAM role was missing `ssm:GetParameter` permissions. She'd pinged `#platform-help` at 4 PM, gotten one emoji reaction and no answers. By 8 PM, nobody had responded. I saw it at 11 PM, traced the issue to a permission boundary I'd applied last month to tighten service account scope, added the exception, tested it, sent Lena a DM: "Should be good now — the boundary was blocking SSM reads. I updated it."
 
 She'll see it tomorrow. She won't know I stayed up until midnight for it. That's fine. I didn't do it for the credit.
 
 I do a lot of things nobody notices. Last week I reviewed 47 Prowler findings — critical severity, the kind that make auditors sweat. I triaged 12. The other 35 are in a spreadsheet I'll get to next sprint. There's always a next sprint. One of those findings was about EC2 instances running IMDSv1 — the instance metadata service version that lets anyone on the network grab IAM credentials with a simple HTTP request. I flagged it, marked it "acknowledged — will remediate next quarter," and moved on.
 
-We have GuardDuty enabled across all accounts. That was Rohan's checkbox. "We have GuardDuty." We also have 2,300 unreviewed findings. Enabling a service isn't the same as using it. GuardDuty is a smoke detector in a building where nobody checks if the batteries work.
+We have GuardDuty enabled across all accounts. That was Erik's checkbox. "We have GuardDuty." We also have 2,300 unreviewed findings. Enabling a service isn't the same as using it. GuardDuty is a smoke detector in a building where nobody checks if the batteries work.
 
 But the detection pipeline — that's mine. CloudTrail events flow into CloudTrail Lake, I write SQL queries against the event data store, and EventBridge triggers Lambda functions when specific patterns appear. It's not sophisticated. It's just *consistent*. I wrote detections for the things that scare me most: `StopLogging`, `DeleteTrail`, `PutBucketPolicy` with public access, `ConsoleLogin` without MFA. The basics. The things that, if you miss them, you're already three moves behind.
 

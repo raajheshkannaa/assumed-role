@@ -253,7 +253,7 @@ aws s3api get-bucket-policy --bucket meridian-datalake-raw \
 
 The policy hasn't been modified. Yet. But the attacker now knows exactly how replication is configured — what IAM roles are used, what destination accounts are trusted, what the bucket policy allows. They're building a playbook.
 
-I almost miss this because I'm focused on the `AssumeRole` chain, the IAM control-plane movement. Attackers don't move only through IAM; they use data-plane APIs too. `GetObject` doesn't appear in CloudTrail management events. You need S3 data events enabled, which costs extra, which Rohan said was "not justified this quarter."
+I almost miss this because I'm focused on the `AssumeRole` chain, the IAM control-plane movement. Attackers don't move only through IAM; they use data-plane APIs too. `GetObject` doesn't appear in CloudTrail management events. You need S3 data events enabled, which costs extra, which Erik said was "not justified this quarter."
 
 Not justified this quarter. I should get that tattooed somewhere.
 

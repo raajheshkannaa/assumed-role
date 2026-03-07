@@ -34,7 +34,7 @@ This is fiction. Meridian Financial is not a real company. The techniques descri
 - **Maya** — Solo security engineer. First person narrator. Thinks in CloudTrail events.
 - **VEGA** — Professional data broker. Buys stolen credentials. Studies environments like a defender. His logic is internally consistent — & that's what makes him dangerous.
 - **Marcus Chen** — Former contractor. Sold credentials he forgot to delete. Didn't know what he was enabling.
-- **Rohan** — VP Engineering. Not a villain — just overwhelmed.
+- **Erik** — VP Engineering. Not a villain — just overwhelmed.
 - **Kira** — Senior dev on payments. Maya's closest thing to an ally.
 
 ## Setting

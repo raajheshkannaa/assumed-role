@@ -355,9 +355,9 @@ It finds VEGA's `monitoring-credential-refresh` Lambda in the security tooling a
 
 Human pattern recognition catches what automation missed.
 
-Fourth: I call Rohan. Not Slack — phone call. 10 AM on a Thursday, and I'm asking for something I've been told "next quarter" for six months.
+Fourth: I call Erik. Not Slack — phone call. 10 AM on a Thursday, and I'm asking for something I've been told "next quarter" for six months.
 
-"Rohan, I need emergency authorization to deploy Service Control Policies across the organization."
+"Erik, I need emergency authorization to deploy Service Control Policies across the organization."
 
 Silence.
 
