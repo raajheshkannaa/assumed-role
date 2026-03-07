@@ -149,11 +149,14 @@ She rewrites the SCP:
                 "DateLessThan": {
                     "aws:TokenIssueTime": "2025-03-13T14:30:00Z"
                 },
-                "StringNotLike": {
+                "ArnNotLike": {
                     "aws:PrincipalArn": [
                         "arn:aws:iam::*:role/cicd-*",
+                        "arn:aws:sts::*:assumed-role/cicd-*/*",
                         "arn:aws:iam::*:role/meridian-service-*",
-                        "arn:aws:iam::*:role/AWSServiceRole*"
+                        "arn:aws:sts::*:assumed-role/meridian-service-*/*",
+                        "arn:aws:iam::*:role/AWSServiceRole*",
+                        "arn:aws:sts::*:assumed-role/AWSServiceRole*/*"
                     ]
                 }
             }

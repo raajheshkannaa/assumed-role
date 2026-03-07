@@ -146,7 +146,7 @@ prowler aws --check ec2_instance_imdsv2_enabled
             "Sid": "RequireIMDSv2",
             "Effect": "Deny",
             "Action": "ec2:RunInstances",
-            "Resource": "arn:aws:ec2:*:*:instance/*",
+            "Resource": "*",
             "Condition": {
                 "StringNotEquals": {
                     "ec2:MetadataHttpTokens": "required"
@@ -180,16 +180,17 @@ prowler aws --check ec2_instance_imdsv2_enabled
 
 **Detection (CloudTrail Lake)**:
 ```sql
--- Detect IAM user creation with admin policies
+-- Detect IAM user creation + privilege escalation + key creation
 SELECT
     eventTime,
+    eventName,
     userIdentity.arn AS creator,
-    requestParameters.userName AS newUser,
+    requestParameters.userName AS targetUser,
     recipientAccountId,
     sourceIPAddress
 FROM event_data_store_id
 WHERE
-    eventName = 'CreateAccessKey'
+    eventName IN ('CreateUser', 'AttachUserPolicy', 'PutUserPolicy', 'CreateAccessKey')
     AND errorCode IS NULL
     AND eventTime > CURRENT_TIMESTAMP - INTERVAL '24' HOUR
 ORDER BY eventTime DESC
@@ -208,16 +209,20 @@ ORDER BY eventTime DESC
 **Detection (CloudTrail Lake)**:
 ```sql
 -- Detect S3 replication to accounts outside the organization
+-- Review destination accounts in ReplicationConfiguration against known org accounts
 SELECT
     eventTime,
     recipientAccountId,
     requestParameters.bucketName,
-    requestParameters.ReplicationConfiguration,
+    requestParameters.ReplicationConfiguration.Rules AS replicationRules,
     sourceIPAddress
 FROM event_data_store_id
 WHERE
     eventName = 'PutBucketReplication'
     AND eventTime > CURRENT_TIMESTAMP - INTERVAL '30' DAY
+    AND requestParameters.ReplicationConfiguration.Rules NOT LIKE '%561029384756%'
+    AND requestParameters.ReplicationConfiguration.Rules NOT LIKE '%487291035561%'
+    AND requestParameters.ReplicationConfiguration.Rules NOT LIKE '%102938475610%'
 ORDER BY eventTime DESC
 ```
 
@@ -279,10 +284,12 @@ ORDER BY eventTime DESC
             "DateLessThan": {
                 "aws:TokenIssueTime": "2025-03-13T14:30:00Z"
             },
-            "StringNotLike": {
+            "ArnNotLike": {
                 "aws:PrincipalArn": [
                     "arn:aws:iam::*:role/cicd-*",
-                    "arn:aws:iam::*:role/AWSServiceRole*"
+                    "arn:aws:sts::*:assumed-role/cicd-*/*",
+                    "arn:aws:iam::*:role/AWSServiceRole*",
+                    "arn:aws:sts::*:assumed-role/AWSServiceRole*/*"
                 ]
             }
         }
@@ -301,7 +308,7 @@ ORDER BY eventTime DESC
 | **CloudTrail Lake** | AWS Native | Primary detection engine — SQL queries against CloudTrail event data store |
 | **EventBridge** | AWS Native | Real-time pattern matching on CloudTrail events, triggering Lambda for alerting |
 | **GuardDuty** | AWS Native | Enabled (2,300 unreviewed findings). Secondary signal, not primary detection |
-| **AWS Config** | AWS Native | Continuous compliance checks. Gap: periodic evaluation cycle allows changes within the window |
+| **AWS Config** | AWS Native | Continuous compliance checks. Gap: transient changes reverted before Config captures them may never be evaluated |
 | **IAM Access Analyzer** | AWS Native | External access detection. Found the overly permissive spoke role trust |
 | **SCPs** | AWS Native | Nuclear option for session revocation. Also used for IMDSv2 enforcement |
 | **VPC Flow Logs** | AWS Native | Network-level evidence when CloudTrail was disabled |
