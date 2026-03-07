@@ -44,3 +44,7 @@ Meridian Financial. Series C fintech, 400 employees, ~45 AWS accounts. Payment p
 ## The Point
 
 You can't defend what you can't see. Compliance isn't security. And no one person should be the entire security team — no matter how good they are.
+
+## License
+
+© 2025 rK. Licensed under [Creative Commons BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). Share freely. Attribute the author. No commercial use without permission.
