@@ -211,15 +211,16 @@ class CodeBlock(Flowable):
 
 
 class BookArt(Flowable):
-    """Larger art piece for the front of the book — represents the whole story."""
+    """Frontispiece art — the visual identity of the book."""
 
-    ART_H = 108  # 1.5 inches tall
+    ART_H = 216  # 3 inches tall
 
     def wrap(self, availWidth, availHeight):
         self.avail = availWidth
         return (availWidth, self.ART_H + 24)
 
     def draw(self):
+        import random
         c = self.canv
         w = self.avail
         h = self.ART_H
@@ -228,18 +229,47 @@ class BookArt(Flowable):
 
         # Dark background strip with rounded corners
         c.setFillColor(BG_CODE)
-        c.roundRect(0, 6, w, h + 12, 6, fill=1, stroke=0)
+        c.roundRect(0, 6, w, h + 12, 8, fill=1, stroke=0)
 
-        # Concentric hexagonal rings — defense in depth, the perimeter
-        # Outer rings: dim, geometric, orderly (the infrastructure)
-        for ring in range(5, 0, -1):
-            r = 12 + ring * 9
+        # --- Outer field: faint CloudTrail JSON lines radiating outward ---
+        rng = random.Random(77)
+        json_fragments = [
+            '"eventVersion": "1.09"', '"type": "IAMUser"',
+            '"eventSource": "sts.amazonaws.com"', '"eventName": "AssumeRole"',
+            '"awsRegion": "us-east-1"', '"sourceIPAddress": "98.47.216.103"',
+            '"principalId": "AIDAIOSFODNN7EXAMPLE"', '"readOnly": false',
+            '"eventCategory": "Management"', '"accountId": "487291035561"',
+            '"accessKeyId": "AKIA..."', '"userAgent": "aws-cli/2.15.0"',
+        ]
+        c.saveState()
+        c.setFont("JetBrains", 3.8)
+        for i, frag in enumerate(json_fragments):
+            angle = (i / len(json_fragments)) * 360
+            rad = math.radians(angle)
+            dist = 72 + rng.uniform(0, 24)
+            tx = cx + dist * math.cos(rad)
+            ty = cy + dist * math.sin(rad)
+            # Rotate text to radiate outward
+            c.saveState()
+            c.translate(tx, ty)
+            c.rotate(angle - 90)
+            v = 0.10 + rng.uniform(0, 0.06)
+            c.setFillColor(Color(v, v + 0.01, v + 0.03))
+            c.drawCentredString(0, 0, frag)
+            c.restoreState()
+        c.restoreState()
+
+        # --- Concentric hexagonal rings — defense in depth ---
+        for ring in range(8, 0, -1):
+            r = 10 + ring * 10.5
             sides = 6
-            v = 0.12 + 0.06 * (5 - ring) / 4
+            v = 0.10 + 0.05 * (8 - ring) / 7
             c.setStrokeColor(Color(v * 0.7, v * 0.74, v * 0.88))
-            c.setLineWidth(0.4 + 0.1 * (5 - ring) / 4)
-            if ring > 3:
-                c.setDash(1.5, 3)
+            c.setLineWidth(0.3 + 0.15 * (8 - ring) / 7)
+            if ring > 5:
+                c.setDash(1.5, 4)
+            elif ring > 3:
+                c.setDash(2, 3)
             else:
                 c.setDash()
             p = c.beginPath()
@@ -254,13 +284,36 @@ class BookArt(Flowable):
             c.drawPath(p, fill=0, stroke=1)
         c.setDash()
 
-        # The breach — a red fracture line cutting through the rings
+        # --- Connection lines between hex vertices (infrastructure mesh) ---
+        c.setStrokeColor(Color(0.12, 0.13, 0.18))
+        c.setLineWidth(0.25)
+        for ring in [3, 5, 7]:
+            r = 10 + ring * 10.5
+            for i in range(6):
+                a1 = math.radians(60 * i - 30)
+                a2 = math.radians(60 * ((i + 2) % 6) - 30)
+                c.line(cx + r * math.cos(a1), cy + r * math.sin(a1),
+                       cx + r * math.cos(a2), cy + r * math.sin(a2))
+
+        # --- Small nodes at hex vertices ---
+        for ring in [2, 4, 6]:
+            r = 10 + ring * 10.5
+            for i in range(6):
+                angle = math.radians(60 * i - 30)
+                nx = cx + r * math.cos(angle)
+                ny = cy + r * math.sin(angle)
+                v = 0.18 + 0.04 * (6 - ring)
+                c.setFillColor(Color(v * 0.7, v * 0.74, v * 0.85))
+                c.circle(nx, ny, 1.5, fill=1, stroke=0)
+
+        # --- The breach — red fracture cutting top to bottom ---
         c.setStrokeColor(RED_ACCENT)
-        c.setLineWidth(1.4)
+        c.setLineWidth(1.6)
         fracture_pts = [
-            (cx + 6, cy + 46), (cx + 3, cy + 28), (cx + 8, cy + 14),
-            (cx + 2, cy + 4), (cx + 5, cy - 8), (cx + 1, cy - 20),
-            (cx + 7, cy - 32), (cx + 3, cy - 44),
+            (cx + 4, cy + 92), (cx + 8, cy + 72), (cx + 2, cy + 54),
+            (cx + 9, cy + 36), (cx + 3, cy + 18), (cx + 7, cy + 4),
+            (cx + 1, cy - 12), (cx + 6, cy - 28), (cx + 2, cy - 44),
+            (cx + 8, cy - 60), (cx + 3, cy - 76), (cx + 6, cy - 92),
         ]
         p = c.beginPath()
         p.moveTo(*fracture_pts[0])
@@ -269,24 +322,37 @@ class BookArt(Flowable):
         c.drawPath(p, fill=0, stroke=1)
 
         # Red glow particles along the fracture
-        import random
-        rng = random.Random(99)
+        rng2 = random.Random(42)
         for fx, fy in fracture_pts:
-            for _ in range(3):
-                px = fx + rng.uniform(-6, 6)
-                py = fy + rng.uniform(-4, 4)
-                sz = rng.uniform(0.6, 1.8)
-                intensity = rng.uniform(0.3, 0.9)
+            for _ in range(5):
+                px = fx + rng2.uniform(-10, 10)
+                py = fy + rng2.uniform(-6, 6)
+                sz = rng2.uniform(0.5, 2.2)
+                intensity = rng2.uniform(0.2, 0.95)
                 c.setFillColor(Color(0.82 * intensity, 0.11 * intensity, 0.09 * intensity))
                 c.circle(px, py, sz, fill=1, stroke=0)
 
-        # Center: a single bright node — the defender
-        c.setFillColor(Color(0.80, 0.82, 0.87))
-        c.circle(cx, cy, 3, fill=1, stroke=0)
-        # Faint halo
-        c.setStrokeColor(Color(0.40, 0.42, 0.50))
-        c.setLineWidth(0.4)
+        # --- Faint red glow wash behind fracture center ---
+        for gi in range(20, 0, -1):
+            gr = gi * 2.5
+            alpha = 0.015 * (20 - gi) / 20
+            c.setFillColor(Color(0.82 * alpha + BG_CODE.red * (1 - alpha),
+                                 0.11 * alpha + BG_CODE.green * (1 - alpha),
+                                 0.09 * alpha + BG_CODE.blue * (1 - alpha)))
+            c.circle(cx + 4, cy, gr, fill=1, stroke=0)
+
+        # --- Center: the defender node ---
+        # Outer halo
+        c.setStrokeColor(Color(0.35, 0.37, 0.45))
+        c.setLineWidth(0.5)
+        c.circle(cx, cy, 12, fill=0, stroke=1)
+        # Inner halo
+        c.setStrokeColor(Color(0.50, 0.52, 0.60))
+        c.setLineWidth(0.6)
         c.circle(cx, cy, 7, fill=0, stroke=1)
+        # Core — bright white dot
+        c.setFillColor(Color(0.90, 0.91, 0.94))
+        c.circle(cx, cy, 3.5, fill=1, stroke=0)
 
 
 class ChapterArt(Flowable):
@@ -667,9 +733,9 @@ def build():
     story.append(PageBreak())
 
     # --- Page 2: Disclaimer with book art ---
-    story.append(Spacer(1, 80))
+    story.append(Spacer(1, 24))
     story.append(BookArt())
-    story.append(Spacer(1, 40))
+    story.append(Spacer(1, 30))
     story.append(Paragraph(
         "This is fiction. The techniques are real. Every CloudTrail event, "
         "SQL query, CLI command, and IAM policy in this book is executable. "
