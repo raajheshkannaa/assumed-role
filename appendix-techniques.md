@@ -208,22 +208,24 @@ ORDER BY eventTime DESC
 
 **Detection (CloudTrail Lake)**:
 ```sql
--- Detect S3 replication to accounts outside the organization
--- Review destination accounts in ReplicationConfiguration against known org accounts
+-- Detect S3 replication configuration changes
+-- CloudTrail Lake returns ReplicationConfiguration as a nested object.
+-- Extract all PutBucketReplication events, then parse each rule's
+-- destination account and compare against your org account list
+-- (e.g., via aws organizations list-accounts or a maintained allowlist).
 SELECT
     eventTime,
     recipientAccountId,
     requestParameters.bucketName,
-    requestParameters.ReplicationConfiguration.Rules AS replicationRules,
+    requestParameters.ReplicationConfiguration,
     sourceIPAddress
 FROM event_data_store_id
 WHERE
     eventName = 'PutBucketReplication'
     AND eventTime > CURRENT_TIMESTAMP - INTERVAL '30' DAY
-    AND requestParameters.ReplicationConfiguration.Rules NOT LIKE '%561029384756%'
-    AND requestParameters.ReplicationConfiguration.Rules NOT LIKE '%487291035561%'
-    AND requestParameters.ReplicationConfiguration.Rules NOT LIKE '%102938475610%'
 ORDER BY eventTime DESC
+-- Post-processing: for each rule in ReplicationConfiguration.Rules,
+-- extract Destination.Account and alert if not in org account list.
 ```
 
 **Prevention**: SCP denying `s3:PutBucketReplication` unless the destination account is within the organization.

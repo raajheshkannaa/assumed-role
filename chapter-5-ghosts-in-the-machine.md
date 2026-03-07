@@ -220,7 +220,7 @@ Except when it's not.
 
 I built walls around the castle and left the servants' entrance unlocked. No — worse. I built a wall checker that checks the walls, but I never told it to check the doors.
 
-I sit on my bed. Laptop balanced on a pillow. The apartment smells like the chai I made at 5 AM and forgot to drink — cold now, a film on the surface. My mother would say I work too hard. She's right. She's been right every Sunday for two years.
+I sit on my bed. Laptop balanced on a pillow. My neck is locked at an angle that will hurt for days — six hours of looking down at a screen propped on bedding will do that. The apartment smells like the chai I made at 5 AM and forgot to drink — cold now, a film on the surface. My mother would say I work too hard. She's right. She's been right every Sunday for two years.
 
 The gap in my defenses isn't a technical failure. It's a *me* failure. I'm one person. I built what I could with the time I had. And what I built has holes because I'm human and humans have blind spots and no single person — no matter how skilled, no matter how dedicated, no matter how many 2 AM alerts they respond to — can see everything.
 
