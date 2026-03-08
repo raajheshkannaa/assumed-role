@@ -74,8 +74,8 @@ Pacu (meridian:svc-payment-processor) > run iam__enum_permissions
 The output was methodical. `svc-payment-processor` had more permissions than a payment processor should. It could describe EC2 instances, list S3 buckets, and — critically — assume roles in other accounts. VEGA mapped the trust relationships:
 
 ```bash
-aws iam list-roles --query "Roles[?AssumeRolePolicyDocument.Statement[?Principal.AWS]]" \
-    --profile meridian --output json | jq '.[].Arn'
+aws iam list-roles --profile meridian --output json \
+    | jq -r '.Roles[] | select(.AssumeRolePolicyDocument.Statement[]?.Principal.AWS?) | .Arn'
 ```
 
 ```
@@ -177,13 +177,13 @@ But I adapt. If they know I'm watching, I need alternative evidence sources for 
 ```bash
 aws logs filter-log-events \
     --log-group-name /vpc/flow-logs/prod-payments \
-    --start-time 1710396703000 \
-    --end-time 1710398503000 \
+    --start-time 1741842703000 \
+    --end-time 1741844503000 \
     --filter-pattern "98.47.216.103" \
     --profile prod-payments
 ```
 
-The flow logs show connections to port 443 — API calls. No surprise. But also connections to port 5432. Postgres. Someone connected to the RDS instance directly during the CloudTrail gap.
+The flow logs show connections from `10.0.47.83` — the EC2 instance in the payments VPC — to the RDS endpoint on port 5432. Postgres. During the CloudTrail gap, someone used that instance to query the database directly.
 
 I need to tell Erik.
 
@@ -191,7 +191,7 @@ I open Slack and create a private channel: `#incident-20250313`. I add Erik and 
 
 > We have a problem. Active compromise in prod-payments. Credentials belong to svc-payment-processor — access key created Sept 2024, never rotated. Attacker disabled CloudTrail, performed recon across multiple accounts over the last 2 weeks. Source IP is residential, not corporate. This is not a drill.
 
-I think about the Cloudflare Thanksgiving incident. November 2023. Cloudflare discovered that threat actors had used authentication tokens from the Okta breach — tokens that were never rotated after the initial compromise. The tokens were months old. Still active. Cloudflare's team caught it because they were paranoid enough to check. It took them eleven days to fully contain.
+I think about the Cloudflare Thanksgiving incident. November 2023. Cloudflare discovered that threat actors had used authentication tokens from the Okta breach — tokens that were never rotated after the initial compromise. The tokens were months old. Still active. Cloudflare's team caught it because they were paranoid enough to check. Their remediation effort stretched into late January — weeks of rotating credentials, reviewing access, and hunting for persistence.
 
 We're not Cloudflare. We don't have a security team of fifty. We have me.
 

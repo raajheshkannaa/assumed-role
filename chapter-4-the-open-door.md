@@ -78,7 +78,7 @@ When Maya disabled `AKIAIOSFODNN7EXAMPLE`, she killed a credential he'd already 
 
 Source one: the STS session tokens from `AssumeRole` calls. When you assume a role in AWS, the temporary credentials you receive are independent of the original caller's key. Revoking the original key doesn't revoke the sessions it spawned. Those sessions have their own expiration — up to 12 hours for assumed role sessions. VEGA had assumed roles into three accounts. Each session was valid until 9 AM.
 
-Source two: the instance role credentials he'd grabbed via SSRF from the IMDSv1 instance in `dev-platform-012`. Those credentials had nothing to do with the `svc-payment-processor` key. They belonged to the EC2 instance's IAM role. As long as that instance was running and the role was attached, the metadata service would happily refresh those credentials every six hours.
+Source two: the instance role credentials he'd grabbed via SSRF from the IMDSv1 instance in `dev-platform-012`. Those credentials had nothing to do with the `svc-payment-processor` key. They belonged to the EC2 instance's IAM role. They'd expire in about six hours — but the SSRF vulnerability was still there. As long as that instance was running and the dev tool remained unpatched, VEGA could hit the same endpoint and grab fresh credentials whenever he needed them.
 
 Two backup paths. Redundancy. The same principles defenders use to build resilient systems.
 
@@ -231,6 +231,7 @@ aws s3api put-bucket-replication \
         "Role": "arn:aws:iam::561029384756:role/s3-replication-role",
         "Rules": [{
             "ID": "backup-compliance-east",
+            "Priority": 2,
             "Status": "Enabled",
             "Filter": {"Prefix": "transactions/"},
             "Destination": {

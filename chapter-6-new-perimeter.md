@@ -2,7 +2,7 @@
 
 ---
 
-2:12 PM. Thursday. Bucharest.
+4:34 PM. Thursday. Bucharest.
 
 VEGA opened a terminal and ran a count on the objects landing in his destination bucket. 847,000 transaction records and climbing. The replication was still running — AWS copying files silently, dutifully, the way it was designed to.
 
@@ -92,7 +92,9 @@ This is the SCP. The one I've been asking to deploy for six months. The one that
 }
 ```
 
-I deploy it to the compromised accounts — `prod-payments-037`, `dev-platform-012`, `staging-data-019`, `prod-datalake-031`, and the security tooling account.
+This kills every assumed role session issued before 14:30 UTC. But the backdoor IAM user — `svc-monitoring-agent` — has long-term access keys, not temporary credentials. `aws:TokenIssueTime` doesn't apply to those. That account I need to burn separately.
+
+I deploy the SCP to the compromised accounts — `prod-payments-037`, `dev-platform-012`, `staging-data-019`, `prod-datalake-031`, and the security tooling account.
 
 ```bash
 aws organizations create-policy \
@@ -154,11 +156,8 @@ She rewrites the SCP:
                 "ArnNotLike": {
                     "aws:PrincipalArn": [
                         "arn:aws:iam::*:role/cicd-*",
-                        "arn:aws:sts::*:assumed-role/cicd-*/*",
                         "arn:aws:iam::*:role/meridian-service-*",
-                        "arn:aws:sts::*:assumed-role/meridian-service-*/*",
-                        "arn:aws:iam::*:role/AWSServiceRole*",
-                        "arn:aws:sts::*:assumed-role/AWSServiceRole*/*"
+                        "arn:aws:iam::*:role/AWSServiceRole*"
                     ]
                 }
             }
@@ -181,6 +180,7 @@ aws s3api put-bucket-replication \
         "Role": "arn:aws:iam::561029384756:role/s3-replication-role",
         "Rules": [{
             "ID": "datalake-replica",
+            "Priority": 1,
             "Status": "Enabled",
             "Filter": {"Prefix": ""},
             "Destination": {
@@ -197,7 +197,7 @@ Step five: close the doors VEGA walked through.
 
 ```bash
 # Enforce IMDSv2 on all instances in dev-platform
-for instance_id in i-0a1b2c3d4e5f6g7 i-0h8i9j0k1l2m3n4 i-0v2w3x4y5z6a7b8; do
+for instance_id in i-0a1b2c3d4e5f6a78 i-0b8c9d0e1f2a3b4c i-0f2a3b4c5d6e7f8a; do
     aws ec2 modify-instance-metadata-options \
         --instance-id "$instance_id" \
         --http-tokens required \
@@ -239,21 +239,21 @@ Step seven: preserve the evidence.
 aws s3 sync \
     s3://meridian-cloudtrail-logs/AWSLogs/ \
     s3://meridian-forensic-evidence/incident-20250313/cloudtrail/ \
-    --include "*2025-03-0*" --include "*2025-03-1*" \
+    --exclude "*" --include "*2025-03-0*" --include "*2025-03-1*" \
     --profile forensic-account
 
 # Copy VPC Flow Logs
 aws s3 sync \
     s3://meridian-vpc-flow-logs/ \
     s3://meridian-forensic-evidence/incident-20250313/vpc-flow-logs/ \
-    --include "*2025-03-1*" \
+    --exclude "*" --include "*2025-03-1*" \
     --profile forensic-account
 
 # Copy S3 server access logs
 aws s3 sync \
     s3://meridian-s3-access-logs/ \
     s3://meridian-forensic-evidence/incident-20250313/s3-access-logs/ \
-    --include "*2025-03-1*" \
+    --exclude "*" --include "*2025-03-1*" \
     --profile forensic-account
 ```
 

@@ -182,9 +182,9 @@ CHECK: ec2_instance_imdsv2_enabled
 SEVERITY: Critical
 STATUS: FAIL (3 instances)
 DETAILS:
-  - i-0a1b2c3d4e5f6g7 (dev-platform-012) - HttpTokens: optional
-  - i-0h8i9j0k1l2m3n4 (dev-platform-012) - HttpTokens: optional
-  - i-0v2w3x4y5z6a7b8 (dev-platform-012) - HttpTokens: optional
+  - i-0a1b2c3d4e5f6a78 (dev-platform-012) - HttpTokens: optional
+  - i-0b8c9d0e1f2a3b4c (dev-platform-012) - HttpTokens: optional
+  - i-0f2a3b4c5d6e7f8a (dev-platform-012) - HttpTokens: optional
 ```
 
 Prowler flagged this three months ago. Check `ec2_instance_imdsv2_enabled`, critical severity. I marked it "acknowledged — will remediate next quarter."
@@ -365,7 +365,7 @@ Silence.
 
 "Maya, SCPs affect every account. If we get it wrong—"
 
-"If we don't deploy them, the attacker still has active sessions in at least three accounts. I can't revoke assumed role sessions by deleting the original key. The only way to kill active sessions is an SCP with a `aws:TokenIssueTime` condition that denies all actions for sessions issued before right now."
+"If we don't deploy them, the attacker still has active sessions in at least three accounts. I can revoke sessions role by role, but I don't know every role they've touched across the org. An SCP with an `aws:TokenIssueTime` condition denies all actions org-wide for sessions issued before right now. One policy, every account, immediate."
 
 More silence.
 

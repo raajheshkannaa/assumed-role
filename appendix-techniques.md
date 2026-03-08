@@ -172,7 +172,7 @@ prowler aws --check ec2_instance_imdsv2_enabled
 
 ### 6. Persistence: Backdoor IAM User + Self-Healing Lambda
 
-**MITRE ATT&CK**: [T1136.003 — Create Account: Cloud Account](https://attack.mitre.org/techniques/T1136/003/) + [T1053.007 — Scheduled Task/Job: Serverless Execution](https://attack.mitre.org/techniques/T1053/007/)
+**MITRE ATT&CK**: [T1136.003 — Create Account: Cloud Account](https://attack.mitre.org/techniques/T1136/003/) + [T1578.005 — Modify Cloud Compute Infrastructure: Serverless](https://attack.mitre.org/techniques/T1578/005/)
 
 **What happened**: VEGA created an IAM user `svc-monitoring-agent` with `AdministratorAccess` in the security tooling account, then deployed a Lambda function triggered by EventBridge every 6 hours to refresh credentials — ensuring the backdoor survived key deletion.
 
@@ -202,7 +202,7 @@ ORDER BY eventTime DESC
 
 **MITRE ATT&CK**: [T1537 — Transfer Data to Cloud Account](https://attack.mitre.org/techniques/T1537/)
 
-**What happened**: VEGA configured S3 replication from `meridian-datalake-raw` to an external account he controlled. S3 replication is asynchronous — AWS copies objects in the background. No additional API calls appear in the source account's CloudTrail for the actual data transfer. The destination bucket must have a bucket policy granting the source account's replication role `s3:ReplicateObject` and `s3:ReplicateDelete` permissions, and the source bucket must have versioning enabled.
+**What happened**: VEGA configured S3 replication from `meridian-datalake-raw` to an external account he controlled. S3 replication is asynchronous — AWS copies objects in the background. No additional API calls appear in the source account's CloudTrail for the actual data transfer. The destination bucket must have a bucket policy granting the source account's replication role `s3:ReplicateObject` and `s3:ReplicateDelete` permissions, and both the source and destination buckets must have versioning enabled.
 
 **CloudTrail event**: `s3:PutBucketReplication`
 
@@ -289,9 +289,7 @@ ORDER BY eventTime DESC
             "ArnNotLike": {
                 "aws:PrincipalArn": [
                     "arn:aws:iam::*:role/cicd-*",
-                    "arn:aws:sts::*:assumed-role/cicd-*/*",
-                    "arn:aws:iam::*:role/AWSServiceRole*",
-                    "arn:aws:sts::*:assumed-role/AWSServiceRole*/*"
+                    "arn:aws:iam::*:role/AWSServiceRole*"
                 ]
             }
         }
