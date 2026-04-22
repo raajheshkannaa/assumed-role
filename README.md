@@ -25,6 +25,15 @@ A fictional cybersecurity story rooted in real AWS attack & defense techniques. 
 
 [Technical Reference](appendix-techniques.md) — Maps every technique to MITRE ATT&CK, real-world incidents, & actual tools.
 
+## Field Manual I — Companion
+
+Six lessons pulled out of the novel, with the fiction cut away. The attacks are what actually happens; the detections are what actually fires.
+
+- [Field Manual I (PDF)](field-manual-i.pdf) — print-ready, ~13 pages
+- [Field Manual I (HTML)](field-manual-i.html) — dark Terminal Noir for screen
+
+Pair with **Field Manual II** (companion to *Signed & Sealed*) for the full twelve-lesson program across both books.
+
 ## Content Warning
 
 This is fiction. Meridian Financial is not a real company. The techniques described are real & documented in public AWS documentation, security research, & post-incident reports. This story exists to teach defense, not to enable offense.

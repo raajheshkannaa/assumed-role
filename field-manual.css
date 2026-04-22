@@ -1,0 +1,359 @@
+/* Field Manual — shared visual system for both volumes.
+ * Terminal Noir applied to a long-read reference document.
+ * Paper mode: black page, dim body, red as wound.
+ * Print mode: strips to ink on paper. */
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Source+Serif+Pro:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap');
+
+:root {
+  --page:   #0e0d0c;
+  --body:   #d6d0c2;
+  --dim:    #8c857a;
+  --ghost:  #5a554d;
+  --steel:  #3a3632;
+  --red:    #c8322a;
+  --bruise: #7a2420;
+  --rule:   #2a2622;
+
+  --mono:  "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --serif: "Source Serif Pro", "Source Serif 4", Georgia, serif;
+
+  --col: 640px;   /* comfortable reading measure */
+}
+
+html, body { margin: 0; padding: 0; background: var(--page); color: var(--body); }
+body {
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.55;
+  font-feature-settings: "kern", "liga";
+  -webkit-font-smoothing: antialiased;
+}
+
+/* scan-line texture, very subtle */
+body::before {
+  content: "";
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(0deg,
+    transparent 0, transparent 2px,
+    rgba(255,255,255,0.012) 2px, rgba(255,255,255,0.012) 3px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+main { position: relative; z-index: 2; }
+
+/* Masthead */
+.mast {
+  border-bottom: 1px solid var(--rule);
+  padding: 28px 40px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 40px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--dim);
+  text-transform: uppercase;
+}
+.mast .left { display: flex; gap: 24px; align-items: center; }
+.mast .vol  { color: var(--red); }
+.mast .right { text-align: right; color: var(--ghost); font-size: 10px; }
+
+/* Cover block */
+.cover {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 120px 40px 80px;
+}
+.cover .kicker {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--red);
+  margin: 0 0 32px;
+  text-transform: uppercase;
+}
+.cover h1 {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 72px;
+  line-height: 0.95;
+  letter-spacing: -1.5px;
+  margin: 0 0 12px;
+  color: #f3ecd9;
+}
+.cover h1 em {
+  font-style: italic;
+  color: var(--red);
+  font-weight: 700;
+}
+.cover .sub {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--dim);
+  text-transform: uppercase;
+  margin: 32px 0 0;
+}
+.cover .deck {
+  font-family: var(--serif);
+  font-size: 19px;
+  line-height: 1.5;
+  color: var(--body);
+  max-width: 520px;
+  margin: 48px 0 0;
+  font-style: italic;
+}
+.cover .deck .attrib {
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ghost);
+  letter-spacing: 1px;
+  display: block;
+  margin-top: 12px;
+}
+
+/* Section rules */
+.rule {
+  border-top: 1px solid var(--rule);
+  margin: 64px auto 0;
+  max-width: var(--col);
+  padding: 0 40px;
+}
+.rule.full { max-width: none; margin-left: 40px; margin-right: 40px; }
+
+/* Preface */
+.preface {
+  max-width: var(--col);
+  margin: 56px auto;
+  padding: 0 40px;
+}
+.preface p { margin: 0 0 16px; color: var(--body); }
+.preface p + p { text-indent: 1.4em; }   /* book-style paragraph indent */
+.preface .first { text-indent: 0; font-size: 19px; }
+
+/* Act heading */
+.act {
+  max-width: var(--col);
+  margin: 96px auto 40px;
+  padding: 0 40px;
+}
+.act .label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: var(--red);
+  text-transform: uppercase;
+  margin: 0 0 8px;
+}
+.act h2 {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 1.05;
+  letter-spacing: -0.5px;
+  margin: 0 0 12px;
+  color: #f3ecd9;
+}
+.act .note {
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--dim);
+  font-size: 16px;
+  margin: 0;
+}
+
+/* Lesson — the atomic unit */
+.lesson {
+  max-width: var(--col);
+  margin: 72px auto;
+  padding: 0 40px;
+  position: relative;
+}
+.lesson .num {
+  position: absolute;
+  top: 6px;
+  left: -12px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--ghost);
+}
+.lesson h3 {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1.1;
+  letter-spacing: -0.3px;
+  margin: 0 0 6px;
+  color: #f3ecd9;
+}
+.lesson .tagline {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--red);
+  text-transform: uppercase;
+  margin: 0 0 24px;
+}
+.lesson p { margin: 0 0 16px; }
+.lesson p em { font-style: italic; color: #e8e1d2; }
+.lesson strong { font-weight: 600; color: #f3ecd9; }
+
+/* Sub-heads inside a lesson. Mono, small, colored, no underline. */
+.lesson h4 {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--dim);
+  text-transform: uppercase;
+  margin: 32px 0 10px;
+  font-weight: 500;
+}
+
+/* Code / queries / policies */
+pre, code {
+  font-family: var(--mono);
+  font-size: 13px;
+}
+.lesson pre {
+  background: #1a1815;
+  border-left: 2px solid var(--red);
+  padding: 14px 16px;
+  margin: 12px 0 16px;
+  overflow-x: auto;
+  color: var(--body);
+  line-height: 1.55;
+}
+.lesson pre .cm  { color: var(--ghost); }    /* comment */
+.lesson pre .kw  { color: #e0a060; }          /* keyword */
+.lesson pre .str { color: #9ab890; }          /* string */
+.lesson pre .bad { color: var(--red); }       /* highlighted bad */
+
+.lesson code:not(pre code) {
+  background: rgba(200, 50, 42, 0.08);
+  color: #e0a060;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-size: 0.88em;
+}
+
+/* Marginal notes — the "field-manual" voice */
+.margin {
+  border-left: 1px solid var(--steel);
+  padding: 4px 0 4px 14px;
+  margin: 20px 0;
+  font-size: 15px;
+  color: var(--dim);
+  font-style: italic;
+}
+.margin b { color: var(--body); font-weight: 600; font-style: normal; font-family: var(--mono); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; display: block; margin-bottom: 4px; }
+
+/* Real-world citation row */
+.cites {
+  margin: 16px 0 0;
+  padding: 14px 0;
+  border-top: 1px dashed var(--steel);
+  border-bottom: 1px dashed var(--steel);
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--dim);
+  line-height: 1.7;
+}
+.cites .label { color: var(--red); letter-spacing: 2px; display: block; margin-bottom: 4px; font-size: 10px; text-transform: uppercase; }
+
+/* List — no heavy bullets */
+ul.clean { list-style: none; padding: 0; margin: 0 0 16px; }
+ul.clean li { padding-left: 18px; position: relative; margin-bottom: 6px; }
+ul.clean li::before {
+  content: "—"; position: absolute; left: 0; color: var(--steel);
+}
+
+/* Closer */
+.closer {
+  max-width: var(--col);
+  margin: 96px auto 56px;
+  padding: 48px 40px;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+.closer .label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: var(--red);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.closer p { margin: 0 0 12px; font-size: 17px; }
+.closer .novel {
+  font-family: var(--serif);
+  font-style: italic;
+  color: #f3ecd9;
+}
+
+/* Colophon */
+.colo {
+  max-width: var(--col);
+  margin: 0 auto 80px;
+  padding: 0 40px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ghost);
+  line-height: 1.7;
+  letter-spacing: 0.5px;
+}
+.colo a { color: var(--dim); text-decoration: none; border-bottom: 1px dotted var(--steel); }
+.colo a:hover { color: var(--red); border-bottom-color: var(--red); }
+
+/* Footer running line */
+.running {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--steel);
+  text-align: center;
+  margin: 48px 0 24px;
+  text-transform: uppercase;
+}
+
+/* ─── PRINT ─────────────────────────────────────────────────────── */
+@media print {
+  :root {
+    --page:  #ffffff;
+    --body:  #14110e;
+    --dim:   #666059;
+    --ghost: #8a847b;
+    --steel: #bfb9ae;
+    --red:   #8a1a14;
+    --bruise:#5a1612;
+    --rule:  #cfc9be;
+  }
+  body { font-size: 11pt; }
+  body::before { display: none; }
+  .mast { border-bottom: 0.5pt solid var(--rule); }
+  .cover h1 { color: #14110e; font-size: 44pt; }
+  .act h2 { color: #14110e; font-size: 22pt; }
+  .lesson h3 { color: #14110e; }
+  .lesson pre { background: #f5f2ec; border-left: 2pt solid var(--red); }
+  .cover, .preface, .act, .lesson, .closer, .colo { page-break-inside: avoid; }
+  .act { page-break-before: always; }
+  .lesson { page-break-before: always; }
+  @page { margin: 2cm; }
+}
+
+/* ─── SMALL SCREENS ─────────────────────────────────────────────── */
+@media (max-width: 720px) {
+  .mast { padding: 20px 20px 14px; flex-direction: column; gap: 8px; align-items: flex-start; }
+  .mast .right { text-align: left; }
+  .cover { padding: 60px 24px 40px; }
+  .cover h1 { font-size: 44px; letter-spacing: -1px; }
+  .cover .deck { font-size: 16px; }
+  .preface, .act, .lesson, .closer, .colo { padding: 0 24px; }
+  .act h2 { font-size: 28px; }
+  .lesson h3 { font-size: 22px; }
+  .lesson .num { position: static; display: block; margin-bottom: 6px; }
+}

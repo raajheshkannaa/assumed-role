@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Field Manual I · Assumed Role</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="stylesheet" href="field-manual.css"/>
+</head>
+<body>
+<main>
+
+<!-- Masthead ────────────────────────────────────────────────── -->
+<header class="mast">
+  <div class="left">
+    <span><span class="vol">Field Manual I</span></span>
+    <span>Assumed Role</span>
+  </div>
+  <div class="right">
+    CSCU · Companion to Book 01<br/>
+    Raajhesh Kannaa
+  </div>
+</header>
+
+<!-- Cover ──────────────────────────────────────────────────── -->
+<section class="cover">
+  <p class="kicker">Field Manual · Volume I</p>
+  <h1>What the <em>role</em><br/>got you.</h1>
+  <p class="sub">Identity, detection, and the shape of a bad Thursday</p>
+  <p class="deck">
+    Six lessons pulled out of the novel, with the fiction cut away. The attacks are what actually happens. The detections are what actually fires. If you recognize any of this, good. Go check.
+    <span class="attrib">Raajhesh Kannaa · April 2026</span>
+  </p>
+</section>
+
+<!-- Preface ────────────────────────────────────────────────── -->
+<section class="preface">
+  <p class="first">The novel takes seventy-two hours. This takes an afternoon. Same material, no plot, no Jess.</p>
+  <p>I wrote <em>Assumed Role</em> because I wanted a story I could hand someone without a security background and have them understand what we do on call. But the readers who actually <em>do</em> this kept asking for the parts underneath. This is those parts.</p>
+  <p>You can read it front to back. You can skip to the one you're arguing about at work. You can copy the detections and ignore the prose. I don't mind. The only rule is that every query in here ran somewhere against real data before I put it on the page, and every fix is one I've either shipped or watched someone ship. If I don't know a clean answer I'll say so.</p>
+</section>
+
+<div class="rule full"></div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- ACT I · IDENTITY                                              -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section class="act">
+  <p class="label">Act I</p>
+  <h2>Identity.</h2>
+  <p class="note">Every other cloud problem is downstream of this one. I keep learning it.</p>
+</section>
+
+<!-- L1 ─────────────────────────────────────────────────────── -->
+<article class="lesson">
+  <span class="num">01</span>
+  <h3>The credential you didn't revoke.</h3>
+  <p class="tagline">Offboarding is a cloud problem now</p>
+
+  <p>Someone left the company. HR filed the ticket. IT disabled Okta. The laptop came back. Good — that's three out of maybe fifteen things.</p>
+
+  <p>What HR doesn't see is the IAM user the engineer created two years ago to wire up a CI tool they were evaluating. Or the access key that ended up in a GitHub Actions secret. Or the role whose trust policy names their personal AWS account so they could test from their side project. None of those get touched by offboarding.</p>
+
+  <p>This is where the book starts. It's also where most of the real incidents I've seen start.</p>
+
+  <h4>What to actually do</h4>
+  <ul class="clean">
+    <li>Maintain a short list of <em>which identities can survive a person leaving</em> — roles assumed by services, access keys for break-glass, SSO permission sets. Everything else should break when the human does.</li>
+    <li>Run a weekly query over CloudTrail looking for AccessKey usage where the key owner isn't in your active directory. Not because it'll be right every time. Because <em>having the query</em> is the point.</li>
+    <li>Kill the concept of long-lived access keys for humans. Full stop. Humans assume roles through SSO. If someone needs an access key, they get a STS session credential with a one-hour lifetime. This is a fight worth having once.</li>
+  </ul>
+
+  <h4>Detection query (CloudTrail Lake)</h4>
+<pre><span class="cm">-- Access keys whose owner no longer exists in our IDP roster.</span>
+<span class="cm">-- The roster is a lookup table you maintain; don't over-engineer it.</span>
+SELECT <span class="kw">userIdentity.userName</span>, <span class="kw">eventName</span>, COUNT(*) <span class="kw">AS</span> n
+<span class="kw">FROM</span> cloudtrail_events
+<span class="kw">WHERE</span> eventTime &gt; current_date - <span class="kw">interval</span> <span class="str">'7'</span> <span class="kw">day</span>
+  <span class="kw">AND</span> userIdentity.type = <span class="str">'IAMUser'</span>
+  <span class="kw">AND</span> userIdentity.userName <span class="kw">NOT IN</span> (<span class="kw">SELECT</span> username <span class="kw">FROM</span> active_roster)
+<span class="kw">GROUP BY</span> 1, 2
+<span class="kw">ORDER BY</span> n <span class="kw">DESC</span>;</pre>
+
+  <div class="margin">
+    <b>Field note</b>
+    The first time I ran this against a real account, it found three keys belonging to people who'd been gone for 18 months, six months, and a week. The week-old one had made 40,000 API calls the day before. That's the one that keeps me honest.
+  </div>
+
+  <div class="cites">
+    <span class="label">Real incidents</span>
+    <b>Uber 2022</b> — initial access through a contractor's credentials that had been harvested and were still valid.  ·
+    <b>Colonial Pipeline 2021</b> — a legacy VPN account with no MFA whose password had leaked.  ·
+    <b>Microsoft 2023 (Storm-0558)</b> — a signing key that hadn't been rotated and was used to forge tokens for 25+ organizations.
+  </div>
+</article>
+
+<!-- L2 ─────────────────────────────────────────────────────── -->
+<article class="lesson">
+  <span class="num">02</span>
+  <h3>Role chaining is a feature. Pretend it isn't.</h3>
+  <p class="tagline">AssumeRole trust policies &amp; the long walk</p>
+
+  <p>You can <code>sts:AssumeRole</code> from one role into another, and from that one into another, and so on. AWS calls this a design feature. Attackers call it a tunnel.</p>
+
+  <p>The specific problem: if Role A is allowed to assume Role B, and Role B has permissions that Role A doesn't, then compromising Role A gets you Role B's blast radius. In most organizations this chain is three or four hops long because no one mapped it. You wrote a trust policy in 2022 because Jenkins needed it. Jenkins is gone. The trust policy isn't.</p>
+
+  <h4>What the policy usually looks like when it's wrong</h4>
+<pre>{
+  <span class="str">"Version"</span>: <span class="str">"2012-10-17"</span>,
+  <span class="str">"Statement"</span>: [{
+    <span class="str">"Effect"</span>: <span class="str">"Allow"</span>,
+    <span class="str">"Principal"</span>: { <span class="str">"AWS"</span>: <span class="bad">"arn:aws:iam::111122223333:root"</span> },
+    <span class="str">"Action"</span>: <span class="str">"sts:AssumeRole"</span>
+  }]
+}
+<span class="cm">// "root" here means "any identity in account 111122223333 with the right policy."</span>
+<span class="cm">// Which, if that account is less locked down than this one, is most of them.</span></pre>
+
+  <h4>What it should look like</h4>
+<pre>{
+  <span class="str">"Version"</span>: <span class="str">"2012-10-17"</span>,
+  <span class="str">"Statement"</span>: [{
+    <span class="str">"Effect"</span>: <span class="str">"Allow"</span>,
+    <span class="str">"Principal"</span>: { <span class="str">"AWS"</span>: <span class="str">"arn:aws:iam::111122223333:role/specific-caller"</span> },
+    <span class="str">"Action"</span>: <span class="str">"sts:AssumeRole"</span>,
+    <span class="str">"Condition"</span>: {
+      <span class="str">"StringEquals"</span>: { <span class="str">"sts:ExternalId"</span>: <span class="str">"<your-external-id>"</span> }
+    }
+  }]
+}</pre>
+
+  <h4>What to actually do</h4>
+  <ul class="clean">
+    <li>Render the trust-policy graph. <em>Literally draw it.</em> There is no good AWS-native tool; I've used <code>awspx</code> and it does the job. You'll be surprised which roles connect to which.</li>
+    <li>Put a <code>Condition</code> block on every trust policy. Even if it's just an <code>aws:SourceAccount</code> check, it's better than nothing.</li>
+    <li>Flag cross-account trust to any account you don't govern. Including your own personal account. Especially your own personal account.</li>
+  </ul>
+
+  <div class="margin">
+    <b>Opinion</b>
+    The AWS docs for trust policies read like they don't want to scare you. They should scare you a little. A misconfigured trust policy is one of the quietest ways an account gets taken over.
+  </div>
+</article>
+
+<!-- L3 ─────────────────────────────────────────────────────── -->
+<article class="lesson">
+  <span class="num">03</span>
+  <h3>The IAM user who didn't need to exist.</h3>
+  <p class="tagline">IAM users vs. roles, and the org-level control that ends the argument</p>
+
+  <p>Every IAM user is a set of keys that lives forever until you delete it. Every role is a set of temporary credentials that expire. This is the entire design of IAM in one sentence. If you are still creating IAM users for services in 2026, you are paying a tax for convenience you don't actually get.</p>
+
+  <p>The fix is one SCP at the org level:</p>
+
+<pre>{
+  <span class="str">"Version"</span>: <span class="str">"2012-10-17"</span>,
+  <span class="str">"Statement"</span>: [{
+    <span class="str">"Sid"</span>: <span class="str">"NoNewIAMUsers"</span>,
+    <span class="str">"Effect"</span>: <span class="str">"Deny"</span>,
+    <span class="str">"Action"</span>: [<span class="str">"iam:CreateUser"</span>, <span class="str">"iam:CreateAccessKey"</span>],
+    <span class="str">"Resource"</span>: <span class="str">"*"</span>
+  }]
+}</pre>
+
+  <p>It breaks some things on the first day. You'll want an exception account for the edge cases (third-party SaaS that can't do OIDC yet). Those exceptions should live in a spreadsheet you review quarterly, not in your production OU.</p>
+
+  <div class="margin">
+    <b>The shape of the argument</b>
+    Whoever pushes back will say: "But this vendor needs an access key." Ask whether the vendor supports IAM Roles Anywhere or OIDC federation. Half of them do and nobody noticed. The other half should be asked why in writing, which creates the paper trail you'll need in two years when you're migrating off them.
+  </div>
+</article>
+
+<div class="rule full"></div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- ACT II · DETECTION                                            -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section class="act">
+  <p class="label">Act II</p>
+  <h2>Detection.</h2>
+  <p class="note">The tools work. The gap is that nobody looks at them until Thursday night.</p>
+</section>
+
+<!-- L4 ─────────────────────────────────────────────────────── -->
+<article class="lesson">
+  <span class="num">04</span>
+  <h3>CloudTrail evasion by <em>not</em> logging.</h3>
+  <p class="tagline">StopLogging, StartLogging, and the four-minute gap</p>
+
+  <p>CloudTrail has an API called <code>StopLogging</code>. If an attacker has the right permission, they can call it, do what they came to do, and call <code>StartLogging</code> again. The gap is invisible unless you're looking for it. Most organizations aren't.</p>
+
+  <p>Nobody should be calling <code>StopLogging</code> in production. It is a high-signal event. Alert on it like you alert on <code>ConsoleLogin</code> with MFA=false.</p>
+
+  <h4>Detection query</h4>
+<pre>SELECT eventTime, userIdentity.arn, sourceIPAddress
+<span class="kw">FROM</span> cloudtrail_events
+<span class="kw">WHERE</span> eventName <span class="kw">IN</span> (<span class="str">'StopLogging'</span>, <span class="str">'DeleteTrail'</span>, <span class="str">'UpdateTrail'</span>)
+  <span class="kw">AND</span> eventTime &gt; current_date - <span class="kw">interval</span> <span class="str">'30'</span> <span class="kw">day</span>
+<span class="kw">ORDER BY</span> eventTime <span class="kw">DESC</span>;</pre>
+
+  <h4>The subtler version</h4>
+  <p>The brute-force attacker calls <code>StopLogging</code>. The careful one modifies the trail to exclude a specific event source, waits, then reverts. That shows up as <code>UpdateTrail</code>, which is boring-looking until you diff the before and after. Keep the JSON of every <code>UpdateTrail</code> invocation and diff it.</p>
+
+  <div class="margin">
+    <b>Why this works for attackers</b>
+    Because most detection systems are downstream of CloudTrail. If the events don't exist, the detections don't fire. It's the cloud version of cutting the phone line before the break-in.
+  </div>
+
+  <div class="cites">
+    <span class="label">Real incidents</span>
+    <b>Capital One 2019</b> — the intrusion used an SSRF to assume a role; the WAF misconfiguration and the lack of alerting on anomalous STS calls is the part that mattered.  ·
+    <b>ChaosDB 2021</b> — not CloudTrail, but the same pattern: logs existed, nobody was watching for the specific shape of the call.
+  </div>
+</article>
+
+<!-- L5 ─────────────────────────────────────────────────────── -->
+<article class="lesson">
+  <span class="num">05</span>
+  <h3>S3 replication is an exfil channel.</h3>
+  <p class="tagline">Legitimate feature, same data out, no EC2 required</p>
+
+  <p>S3 replication is the thing you turn on to copy a bucket's contents to another bucket, maybe in another region, for DR. An attacker with <code>s3:PutBucketReplication</code> on a sensitive bucket can point the replication at a bucket they own in an account they own. AWS will dutifully copy the data for them. Every object. Forever. Until someone notices the replication rule.</p>
+
+  <p>The event in CloudTrail is <code>PutBucketReplication</code>. It is almost never legitimate in a production account. Treat it as a fire drill.</p>
+
+  <h4>Prevention (SCP)</h4>
+<pre>{
+  <span class="str">"Sid"</span>: <span class="str">"OnlyReplicateToOurAccounts"</span>,
+  <span class="str">"Effect"</span>: <span class="str">"Deny"</span>,
+  <span class="str">"Action"</span>: <span class="str">"s3:PutBucketReplication"</span>,
+  <span class="str">"Resource"</span>: <span class="str">"*"</span>,
+  <span class="str">"Condition"</span>: {
+    <span class="str">"StringNotEqualsIfExists"</span>: {
+      <span class="str">"aws:ResourceAccount"</span>: [<span class="str">"&lt;list of our accounts&gt;"</span>]
+    }
+  }
+}</pre>
+
+  <h4>Detection (runs every 15 min)</h4>
+<pre>SELECT eventTime, userIdentity.arn, requestParameters
+<span class="kw">FROM</span> cloudtrail_events
+<span class="kw">WHERE</span> eventName = <span class="str">'PutBucketReplication'</span>
+  <span class="kw">AND</span> eventTime &gt; current_timestamp - <span class="kw">interval</span> <span class="str">'15'</span> <span class="kw">minute</span>;</pre>
+
+  <div class="margin">
+    <b>Rarer than people think</b>
+    In four years of looking I have seen exactly one legitimate <code>PutBucketReplication</code> outside of Terraform. The cost of alerting on every one is low. The cost of missing one is catastrophic.
+  </div>
+</article>
+
+<!-- L6 ─────────────────────────────────────────────────────── -->
+<article class="lesson">
+  <span class="num">06</span>
+  <h3>Write the detection <em>before</em> you need it.</h3>
+  <p class="tagline">Detection-as-code, and the 3 AM test</p>
+
+  <p>The detections in this manual are cheap. Writing them after the incident is not. The single largest multiplier on incident response is whether the query already exists. If it exists, you paste and run. If it doesn't, you write it while your adrenaline is up and it's slightly wrong.</p>
+
+  <p>Three rules.</p>
+
+  <ul class="clean">
+    <li><strong>Every detection is a file in a repo.</strong> Not a saved search in a vendor UI. A file. You can diff it, review it, roll it back.</li>
+    <li><strong>Every detection has a test.</strong> A synthetic event, a known payload, something that makes the query fire. If it doesn't fire on the test, it won't fire in the incident.</li>
+    <li><strong>The 3 AM test.</strong> Imagine reading your own detection at 3 AM on a phone. If it doesn't tell you what to do next in the first two sentences, rewrite it.</li>
+  </ul>
+
+  <div class="margin">
+    <b>Where this came from</b>
+    Jess's notebook in the novel is real. The detections she copy-pastes from her own past incidents are the pattern I wish I'd started with. It took me too long to realize that the best thing I could do between incidents was <em>make the next incident cheaper</em>.
+  </div>
+
+  <h4>Tools worth the time</h4>
+  <ul class="clean">
+    <li><a href="https://github.com/panther-labs/panther">Panther</a> or <a href="https://github.com/StreamAlert/streamalert">StreamAlert</a> if you want detections-as-code as a first-class practice.</li>
+    <li><a href="https://github.com/cado-security/varc">varc</a> when you need a volatile-artifact snapshot from a running EC2 instance during IR.</li>
+    <li>Your own CloudTrail Lake queries, versioned in a repo, with a GitHub Action that runs them against a test dataset on every PR.</li>
+  </ul>
+</article>
+
+<!-- Closer ──────────────────────────────────────────────────── -->
+<section class="closer">
+  <p class="label">End of Volume I</p>
+  <p>Six lessons is not a full program. It's the floor. If your identity hygiene, detection coverage, and response muscle are better than what's in here, good — the next volume covers supply chain, which is a different problem. If they aren't, start with the week-old key in Lesson 1 and work down.</p>
+  <p>The long-form is in <span class="novel">Assumed Role</span>, the novel this manual comes out of. Jess's seventy-two hours are mine, and they're someone else's you know.</p>
+</section>
+
+<!-- Colophon ────────────────────────────────────────────────── -->
+<section class="colo">
+  <p>
+    Set in IBM Plex Mono and Source Serif Pro. Written on paper first, typed second. Print-ready; Cmd-P strips the screen aesthetic and gives you ink on white.
+  </p>
+  <p>
+    Raajhesh Kannaa · Toronto · <a href="https://defensive.works">defensive.works</a><br/>
+    Cloud Security Cinematic Universe · Book 01 · Field Manual I · April 2026
+  </p>
+</section>
+
+<p class="running">— end of field manual i —</p>
+
+</main>
+</body>
+</html>
