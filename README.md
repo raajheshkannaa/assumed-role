@@ -10,6 +10,11 @@ A fictional cybersecurity story rooted in real AWS attack & defense techniques. 
 
 ~12,000 words. 45-60 minutes.
 
+## Read it
+
+- [Read online](https://defensive.works/books/assumed-role/assumed-role.html) — single-page HTML, reflows on phone
+- [Download PDF](https://defensive.works/books/assumed-role/assumed-role.pdf) — 89 pages, print-ready
+
 ## Chapters
 
 | # | Title | Words | What Happens |
